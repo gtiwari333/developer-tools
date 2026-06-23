@@ -77,47 +77,50 @@ public final class ContentPanel extends JPanel {
 
     /**
      * Open a tool or focus its existing tab (single-click behaviour).
-     * Searches by base tool ID, ignoring the {@code @timestamp} suffix.
      */
     public void openTool(ToolFactory<?> factory) {
-        String baseId = factory.getId();
-
-        // Find any existing tab for this tool type
-        for (var entry : openTabs.entrySet()) {
-            if (extractBaseId(entry.getKey()).equals(baseId)) {
-                int idx = tabbedPane.indexOfComponent(entry.getValue().workbench);
-                if (idx >= 0) { tabbedPane.setSelectedIndex(idx); return; }
-            }
+        String toolId = factory.getId();
+        ToolTab existing = openTabs.get(toolId);
+        if (existing != null) {
+            int idx = tabbedPane.indexOfComponent(existing.workbench);
+            if (idx >= 0) { tabbedPane.setSelectedIndex(idx); return; }
         }
-
         openToolInNewTab(factory);
     }
 
     /**
-     * Always create a fresh tab for this tool, even if one is already open.
-     * Used for double-click and right-click "Open in new tab".
+     * Open a new workbench for this tool — if a tab for this tool already
+     * exists, add a nested workbench tab inside it. Otherwise create a new
+     * top-level tab.
      */
     public void openToolInNewTab(ToolFactory<?> factory) {
-        String toolId = factory.getId();
+        String baseId = factory.getId();
 
+        // If this tool already has an open top-level tab, add a nested workbench to it
+        for (var entry : openTabs.entrySet()) {
+            if (entry.getKey().equals(baseId)) {
+                entry.getValue().workbench.newWorkbench();
+                tabbedPane.setSelectedComponent(entry.getValue().workbench);
+                fireOpenStateChanged();
+                return;
+            }
+        }
+
+        // No existing tab — create a new top-level one
         var workbench = new WorkbenchTabbedPane(factory, settingsManager);
-        // Use a unique key when multiple tabs of the same tool are open
-        String uniqueKey = toolId + "@" + System.nanoTime();
-        openTabs.put(uniqueKey, new ToolTab(factory, workbench));
+        String toolId = baseId;
+        workbench.setOnEmpty(() -> closeTool(toolId));
+        openTabs.put(baseId, new ToolTab(factory, workbench));
 
         if (tabbedPane.getTabCount() == 0) {
             removeAll();
             add(tabbedPane, BorderLayout.CENTER);
         }
 
-        String title = factory.getPresentation().contentTitle();
-        // Append count if there are already tabs for this tool
-        int sameToolCount = countOpenTabsFor(toolId);
-        if (sameToolCount > 1) title = title + " (" + sameToolCount + ")";
-
         tabbedPane.addTab(null, workbench);
         int index = tabbedPane.getTabCount() - 1;
-        tabbedPane.setTabComponentAt(index, createTabHeader(factory, workbench, uniqueKey, title));
+        tabbedPane.setTabComponentAt(index, createTabHeader(factory, workbench, baseId,
+                factory.getPresentation().contentTitle()));
         tabbedPane.setSelectedIndex(index);
 
         workbench.activate();
@@ -126,30 +129,17 @@ public final class ContentPanel extends JPanel {
         fireOpenStateChanged();
     }
 
-    private int countOpenTabsFor(String toolId) {
-        int count = 0;
-        for (String key : openTabs.keySet()) {
-            if (key.startsWith(toolId + "@")) count++;
-        }
-        return count;
-    }
-
     /** Close a specific tool tab. Always allowed even if pinned. */
     public void closeTool(String toolId) {
         closeToolInternal(toolId, true);
     }
 
-    /** Close a tool tab unless its base tool is pinned and force is false. */
-    private void closeToolInternal(String uniqueKey, boolean force) {
-        if (!force && pinnedToolIds.contains(extractBaseId(uniqueKey))) return;
-
-        ToolTab tab = openTabs.remove(uniqueKey);
+    /** Close a tool tab unless its tool is pinned and force is false. */
+    private void closeToolInternal(String toolId, boolean force) {
+        if (!force && pinnedToolIds.contains(toolId)) return;
+        ToolTab tab = openTabs.remove(toolId);
         if (tab == null) return;
-        // Only remove pin if this was the last tab for that tool
-        String base = extractBaseId(uniqueKey);
-        if (openTabs.keySet().stream().noneMatch(k -> extractBaseId(k).equals(base))) {
-            pinnedToolIds.remove(base);
-        }
+        pinnedToolIds.remove(toolId);
 
         int idx = tabbedPane.indexOfComponent(tab.workbench);
         if (idx >= 0) {
@@ -173,14 +163,11 @@ public final class ContentPanel extends JPanel {
     // Batch operations
     // ---------------------------------------------------------------
 
-    /** Close all tabs in the same group as {@code uniqueKey}, except this one and pinned. */
-    public void closeSimilarTools(String uniqueKey) {
-        String baseId = extractBaseId(uniqueKey);
+    /** Close all tabs in the same group as {@code toolId}, except this one and pinned. */
+    public void closeSimilarTools(String toolId) {
         for (String id : new ArrayList<>(openTabs.keySet())) {
-            if (id.equals(uniqueKey)) continue; // keep this tab
-            if (sameToolGroup(baseId, extractBaseId(id))) {
-                closeToolInternal(id, false);
-            }
+            if (id.equals(toolId)) continue; // keep this tab
+            if (sameToolGroup(toolId, id)) closeToolInternal(id, false);
         }
     }
 
@@ -191,26 +178,13 @@ public final class ContentPanel extends JPanel {
         }
     }
 
-    /** Toggle pin. Pins are stored by base tool ID (not unique key). */
-    public void togglePin(String uniqueKey) {
-        String base = extractBaseId(uniqueKey);
-        if (pinnedToolIds.contains(base)) {
-            pinnedToolIds.remove(base);
-        } else if (openTabs.containsKey(uniqueKey)) {
-            pinnedToolIds.add(base);
-        }
+    public void togglePin(String toolId) {
+        if (pinnedToolIds.contains(toolId)) pinnedToolIds.remove(toolId);
+        else if (openTabs.containsKey(toolId)) pinnedToolIds.add(toolId);
         refreshTabHeaders();
     }
 
-    public boolean isPinned(String uniqueKey) {
-        return pinnedToolIds.contains(extractBaseId(uniqueKey));
-    }
-
-    /** Strip the "@timestamp" suffix to get the base tool ID. */
-    static String extractBaseId(String uniqueKey) {
-        int at = uniqueKey.lastIndexOf('@');
-        return at > 0 ? uniqueKey.substring(0, at) : uniqueKey;
-    }
+    public boolean isPinned(String toolId) { return pinnedToolIds.contains(toolId); }
 
     // ---------------------------------------------------------------
     // UI helpers
@@ -341,10 +315,8 @@ public final class ContentPanel extends JPanel {
         return ga != null && ga.equals(gb) && !ga.isEmpty();
     }
 
-    /** True if any tab of this tool type is open. */
-    public boolean isToolOpen(String toolId) {
-        return openTabs.keySet().stream().anyMatch(k -> k.startsWith(toolId + "@"));
-    }
+    /** True if a tab for this tool is currently open. */
+    public boolean isToolOpen(String toolId) { return openTabs.containsKey(toolId); }
     public void addOpenStateListener(Runnable listener) { openStateListeners.add(listener); }
     private void fireOpenStateChanged() { openStateListeners.forEach(Runnable::run); }
 

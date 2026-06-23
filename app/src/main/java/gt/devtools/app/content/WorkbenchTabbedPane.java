@@ -24,6 +24,8 @@ public final class WorkbenchTabbedPane extends JPanel {
     private final List<TabEntry> tabs = new ArrayList<>();
     private final ToolTitleBar titleBar;
 
+    private Runnable onEmpty; // called when all workbenches are closed
+
     public WorkbenchTabbedPane(ToolFactory<?> factory, SettingsManager settingsManager) {
         super(new BorderLayout());
         this.factory = factory;
@@ -102,7 +104,6 @@ public final class WorkbenchTabbedPane extends JPanel {
     }
 
     public void closeWorkbench(int index) {
-        if (tabs.size() <= 1) return; // keep at least one
         if (index < 0 || index >= tabs.size()) return;
 
         TabEntry entry = tabs.remove(index);
@@ -110,17 +111,25 @@ public final class WorkbenchTabbedPane extends JPanel {
         settingsManager.deleteToolConfig(entry.config.getId());
         tabbedPane.removeTabAt(index);
 
+        if (tabs.isEmpty() && onEmpty != null) {
+            onEmpty.run();
+            return;
+        }
+
         // Update remaining close button indices
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             var comp = tabbedPane.getTabComponentAt(i);
             if (comp instanceof JPanel panel && panel.getComponentCount() > 1) {
                 var btn = (JButton) panel.getComponent(1);
-                final int idx = i;
                 for (var al : btn.getActionListeners()) btn.removeActionListener(al);
+                final int idx = i;
                 btn.addActionListener(e -> closeWorkbench(idx));
             }
         }
     }
+
+    /** Called by ContentPanel so this workbench can request its own removal. */
+    void setOnEmpty(Runnable onEmpty) { this.onEmpty = onEmpty; }
 
     public void resetCurrent() {
         int idx = tabbedPane.getSelectedIndex();
