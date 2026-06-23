@@ -50,17 +50,34 @@ public final class ToolSidebar extends JPanel {
         tree.setCellRenderer(new ToolTreeCellRenderer());
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-        // Use mouse listener so clicking an already-selected node still opens it
+        // Mouse listener: single-click opens (or focuses), double-click opens in new tab,
+        // right-click shows context menu.
         tree.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent e) {
                 var path = tree.getPathForLocation(e.getX(), e.getY());
-                if (path != null) {
-                    var node = (DefaultMutableTreeNode) path.getLastPathComponent();
-                    if (node instanceof ToolTreeNode toolNode) {
-                        tree.setSelectionPath(path);
-                        contentPanel.openTool(toolNode.factory);
-                    }
+                if (path == null) return;
+                var node = (DefaultMutableTreeNode) path.getLastPathComponent();
+                if (!(node instanceof ToolTreeNode toolNode)) return;
+
+                tree.setSelectionPath(path);
+
+                if (e.isPopupTrigger()) {
+                    showToolContextMenu(toolNode, e);
+                } else if (e.getClickCount() == 2) {
+                    contentPanel.openToolInNewTab(toolNode.factory);
+                } else if (e.getClickCount() == 1) {
+                    contentPanel.openTool(toolNode.factory);
+                }
+            }
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                var path = tree.getPathForLocation(e.getX(), e.getY());
+                if (path == null) return;
+                var node = (DefaultMutableTreeNode) path.getLastPathComponent();
+                if (node instanceof ToolTreeNode toolNode && e.isPopupTrigger()) {
+                    tree.setSelectionPath(path);
+                    showToolContextMenu(toolNode, e);
                 }
             }
         });
@@ -166,6 +183,19 @@ public final class ToolSidebar extends JPanel {
         for (int i = 0; i < tree.getRowCount(); i++) {
             tree.expandRow(i);
         }
+    }
+
+    // -- context menu
+
+    private void showToolContextMenu(ToolTreeNode toolNode, java.awt.event.MouseEvent e) {
+        var menu = new JPopupMenu();
+        var useItem = new JMenuItem("Open this tool");
+        useItem.addActionListener(ev -> contentPanel.openTool(toolNode.factory));
+        menu.add(useItem);
+        var newTabItem = new JMenuItem("Open in new tab");
+        newTabItem.addActionListener(ev -> contentPanel.openToolInNewTab(toolNode.factory));
+        menu.add(newTabItem);
+        menu.show(tree, e.getX(), e.getY());
     }
 
     // -- custom tree node
