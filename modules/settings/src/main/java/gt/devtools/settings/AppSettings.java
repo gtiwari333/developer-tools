@@ -16,7 +16,7 @@ public final class AppSettings {
     private int windowHeight;
     private int windowX = -1;   // -1 → centre on first launch
     private int windowY = -1;
-    private int dividerLocation = 280;  // sidebar width in pixels
+    private int dividerLocation = 320;  // sidebar width in pixels
 
     // -- Appearance
     private String theme = "dark";       // "dark" | "light" | "" (auto-detect)

@@ -26,8 +26,8 @@ public final class ToolSidebar extends JPanel {
         super(new BorderLayout());
         this.contentPanel = contentPanel;
 
-        setMinimumSize(new Dimension(200, 0));
-        setPreferredSize(new Dimension(280, 0));
+        setMinimumSize(new Dimension(240, 0));
+        setPreferredSize(new Dimension(320, 0));
 
         // -- search field
         searchField = new JTextField();
@@ -90,6 +90,10 @@ public final class ToolSidebar extends JPanel {
 
         var scrollPane = new JScrollPane(tree);
         scrollPane.setBorder(null);
+        // Let the tree fill the width — prevents text truncation
+        tree.setPreferredSize(null);
+        // Disable horizontal scrolling so the tree uses the full sidebar width
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scrollPane, BorderLayout.CENTER);
     }
 
@@ -216,15 +220,15 @@ public final class ToolSidebar extends JPanel {
                                                       boolean leaf, int row, boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             if (value instanceof ToolTreeNode tn) {
-                // Show a dot indicator (●) if the tool is currently open in a tab
-                if (contentPanel.isToolOpen(tn.factory.getId())) {
-                    setText("● " + tn.factory.getPresentation().menuTitle());
-                    setFont(getFont().deriveFont(Font.BOLD));
-                } else {
-                    setText(tn.factory.getPresentation().menuTitle());
-                    setFont(getFont().deriveFont(Font.PLAIN));
-                }
+                String text = contentPanel.isToolOpen(tn.factory.getId())
+                        ? "● " + tn.factory.getPresentation().menuTitle()
+                        : tn.factory.getPresentation().menuTitle();
+                setText(text);
+                setFont(getFont().deriveFont(contentPanel.isToolOpen(tn.factory.getId())
+                        ? Font.BOLD : Font.PLAIN));
                 setIcon(null);
+                // Prevent text clipping — ensure the label shows the full text
+                setPreferredSize(null);
             }
             return this;
         }

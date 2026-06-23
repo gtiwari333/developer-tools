@@ -70,6 +70,12 @@ public abstract class TextTransformer extends DeveloperTool {
         panel.add(splitPane, BorderLayout.CENTER);
     }
 
+    @Override
+    protected void afterBuildUi() {
+        resultEditor.setText("Type or paste text on the left, then click '" +
+                getTransformLabel() + " →' or enable Live mode.");
+    }
+
     /** Build the action bar between source and result. */
     protected JPanel buildActionBar() {
         var bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));

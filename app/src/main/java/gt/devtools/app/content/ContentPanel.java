@@ -77,14 +77,17 @@ public final class ContentPanel extends JPanel {
 
     /**
      * Open a tool or focus its existing tab (single-click behaviour).
+     * Searches by base tool ID, ignoring the {@code @timestamp} suffix.
      */
     public void openTool(ToolFactory<?> factory) {
-        String toolId = factory.getId();
+        String baseId = factory.getId();
 
-        ToolTab existing = openTabs.get(toolId);
-        if (existing != null) {
-            int idx = tabbedPane.indexOfComponent(existing.workbench);
-            if (idx >= 0) { tabbedPane.setSelectedIndex(idx); return; }
+        // Find any existing tab for this tool type
+        for (var entry : openTabs.entrySet()) {
+            if (extractBaseId(entry.getKey()).equals(baseId)) {
+                int idx = tabbedPane.indexOfComponent(entry.getValue().workbench);
+                if (idx >= 0) { tabbedPane.setSelectedIndex(idx); return; }
+            }
         }
 
         openToolInNewTab(factory);

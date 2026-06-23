@@ -53,6 +53,12 @@ public final class DevToolsApp {
         setupTheme(appSettings);
         System.out.println("Theme applied");
 
+        // Warm up RSyntaxTextArea — the first creation loads and parses syntax
+        // definition XML files from disk, which is slow (~200-500ms). Doing it
+        // here amortises the cost before any tool UI is built.
+        warmUpEditor();
+        System.out.println("Editor warmed up");
+
         // Discover tools
         ToolRegistry.getInstance().discover();
         System.out.println("Tools discovered: " + ToolRegistry.getInstance().getAllTools().size() + " tools");
@@ -105,6 +111,19 @@ public final class DevToolsApp {
             return lnf.toLowerCase().contains("dark");
         } catch (Exception e) {
             return true; // default to dark
+        }
+    }
+
+    /**
+     * Create a throwaway RSyntaxTextArea to force loading of syntax
+     * definition files. Subsequent creations are nearly instant.
+     */
+    private static void warmUpEditor() {
+        try {
+            var area = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea(1, 1);
+            area.setSyntaxEditingStyle(org.fife.ui.rsyntaxtextarea.SyntaxConstants.SYNTAX_STYLE_NONE);
+        } catch (Exception ignored) {
+            // Non-critical — tools will still work, just slower on first open
         }
     }
 
