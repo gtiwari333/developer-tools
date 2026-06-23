@@ -3,7 +3,9 @@ import gt.devtools.tools.encoders.EncodersToolProvider;
 
 module gt.devtools.tools.encoders {
     requires transitive gt.devtools.tools.api;
+    requires java.desktop;
     requires org.apache.commons.codec;
+    requires org.jose4j;
 
     exports gt.devtools.tools.encoders;
 
