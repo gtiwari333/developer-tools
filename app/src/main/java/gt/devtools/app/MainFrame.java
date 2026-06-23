@@ -21,6 +21,7 @@ public final class MainFrame extends JFrame {
     private final ToolSidebar sidebar;
     private final ContentPanel contentPanel;
     private final JSplitPane splitPane;
+    private boolean menuBarInstalled;
 
     public MainFrame(SettingsManager settingsManager, AppSettings appSettings) {
         this.settingsManager = settingsManager;
@@ -29,7 +30,7 @@ public final class MainFrame extends JFrame {
         setTitle("Developer Tools");
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-        // Build all content FIRST
+        // Build content
         contentPanel = new ContentPanel(settingsManager);
         sidebar = new ToolSidebar(contentPanel);
 
@@ -39,21 +40,32 @@ public final class MainFrame extends JFrame {
         add(splitPane, BorderLayout.CENTER);
         add(buildStatusBar(), BorderLayout.SOUTH);
 
-        // Set menu bar AFTER adding content, so the frame's insets are correct
-        // for dropdown positioning
-        setJMenuBar(buildMenuBar());
-
-        // Now set size and position with the correct insets
-        setSize(appSettings.getWindowWidth(), appSettings.getWindowHeight());
-
+        // Size and position — use 75% of screen on first launch
+        int width = appSettings.getWindowWidth();
+        int height = appSettings.getWindowHeight();
+        if (width <= 0 || height <= 0) {
+            var screen = Toolkit.getDefaultToolkit().getScreenSize();
+            width = (int) (screen.width * 0.75);
+            height = (int) (screen.height * 0.75);
+        }
+        setSize(width, height);
         if (appSettings.getWindowX() >= 0 && appSettings.getWindowY() >= 0) {
             setLocation(appSettings.getWindowX(), appSettings.getWindowY());
         } else {
             setLocationRelativeTo(null);
         }
 
-        // Window close → save state
+        // Defer menu bar until the window is fully on-screen so popup
+        // coordinates are calculated from the WM-assigned position.
         addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                if (!menuBarInstalled) {
+                    menuBarInstalled = true;
+                    setJMenuBar(buildMenuBar());
+                    revalidate();
+                }
+            }
             @Override
             public void windowClosing(WindowEvent e) {
                 saveAndExit();

@@ -24,6 +24,15 @@ public final class DevToolsApp {
     private DevToolsApp() {}
 
     public static void main(String[] args) {
+        // Force heavyweight popup menus — critical for correct dropdown positioning
+        // on Linux WMs where lightweight popups get wrong screen coordinates.
+        JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+        ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+
+        // Use native OS window decorations (minimize, maximize, close buttons).
+        // FlatLaf on Linux sometimes draws custom title bars that lack these.
+        System.setProperty("flatlaf.useWindowDecorations", "false");
+
         // Catch any exceptions on the EDT so they don't kill the app silently
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             var sw = new StringWriter();

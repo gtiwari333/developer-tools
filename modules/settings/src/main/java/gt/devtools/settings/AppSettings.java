@@ -12,8 +12,8 @@ public final class AppSettings {
     public AppSettings() {}
 
     // -- Window geometry
-    private int windowWidth = 1200;
-    private int windowHeight = 800;
+    private int windowWidth;
+    private int windowHeight;
     private int windowX = -1;   // -1 → centre on first launch
     private int windowY = -1;
     private int dividerLocation = 280;  // sidebar width in pixels
