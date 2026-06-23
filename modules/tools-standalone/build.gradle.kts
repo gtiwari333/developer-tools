@@ -1,5 +1,12 @@
 plugins { java }
 
+tasks.compileJava {
+    // jfiglet lacks JPMS metadata — allow reading from classpath
+    options.compilerArgs.addAll(listOf(
+        "--add-reads", "gt.devtools.tools.standalone=ALL-UNNAMED"
+    ))
+}
+
 dependencies {
     implementation(project(":modules:common"))
     implementation(project(":modules:settings"))

@@ -18,7 +18,16 @@ public final class StandaloneToolProvider implements ToolProvider {
                 new RegexMatcherTool.Factory(),
                 new JsonPathTool.Factory(),
                 new DatetimeConverterTool.Factory(),
-                new CronExpressionTool.Factory()
+                new CronExpressionTool.Factory(),
+                new ColorPickerTool.Factory(),
+                new QrCodeGeneratorTool.Factory(),
+                new AsciiArtTool.Factory(),
+                new UnitConverterTool.Factory(),
+                new ServerCertificatesTool.Factory(),
+                new ArchiveInspectorTool.Factory(),
+                new HttpServerTool.Factory(),
+                new NotesTool.Factory(),
+                new RubberDuckTool.Factory()
         );
     }
 }
