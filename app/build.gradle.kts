@@ -9,6 +9,11 @@ application {
     mainModule.set("gt.devtools.app")
 }
 
+// Never skip the run task — Gradle 9.x may mark it UP-TO-DATE incorrectly
+tasks.named("run") {
+    outputs.upToDateWhen { false }
+}
+
 dependencies {
     implementation(project(":modules:common"))
     implementation(project(":modules:settings"))

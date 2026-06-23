@@ -1,6 +1,5 @@
 package gt.devtools.tools.crypto;
 
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import gt.devtools.common.ValueProperty;
 import gt.devtools.settings.ToolConfiguration;
 import gt.devtools.tools.api.ToolFactory;
@@ -13,9 +12,13 @@ import java.security.SecureRandom;
 
 /**
  * Generates compact, URL-safe, cryptographically-strong random IDs
- * using the Nano ID algorithm. Uses {@code jnanoid} library.
+ * using the Nano ID algorithm. Implemented with JDK classes only
+ * (no external dependency).
  */
 public final class NanoIdGeneratorTool extends OneLineTextGenerator {
+
+    private static final char[] ALPHABET =
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-".toCharArray();
 
     private final ValueProperty<Integer> length;
 
@@ -37,8 +40,12 @@ public final class NanoIdGeneratorTool extends OneLineTextGenerator {
 
     @Override
     protected String generate() {
-        return NanoIdUtils.randomNanoId(new SecureRandom(),
-                NanoIdUtils.DEFAULT_ALPHABET, length.get());
+        var rng = new SecureRandom();
+        var sb = new StringBuilder(length.get());
+        for (int i = 0; i < length.get(); i++) {
+            sb.append(ALPHABET[rng.nextInt(ALPHABET.length)]);
+        }
+        return sb.toString();
     }
 
     public static final class Factory implements ToolFactory<NanoIdGeneratorTool> {
@@ -50,6 +57,8 @@ public final class NanoIdGeneratorTool extends OneLineTextGenerator {
                     "Nano ID Generator", "Nano ID Generator").withGroupId("crypto");
         }
         @Override
-        public NanoIdGeneratorTool create(ToolConfiguration config) { return new NanoIdGeneratorTool(config); }
+        public NanoIdGeneratorTool create(ToolConfiguration config) {
+            return new NanoIdGeneratorTool(config);
+        }
     }
 }
