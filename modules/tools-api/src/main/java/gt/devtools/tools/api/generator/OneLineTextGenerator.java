@@ -8,21 +8,60 @@ import gt.devtools.tools.api.converter.TextEditor;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
 
 /**
- * Base for generator tools that produce a single line of output
- * (UUID, NanoID, password, etc.). Provides a config area, a large
- * generated-value display, copy/regenerate actions, and optional
- * bulk generation.
+ * Base class for generator tools that produce a single line of output
+ * (UUID, NanoID, password, lorem ipsum, hash, HMAC, etc.).
+ *
+ * <h3>Layout</h3>
+ * <pre>
+ * ┌──────────────────────────┐
+ * │  Configuration controls  │  ← buildConfigurationUi()
+ * ├──────────────────────────┤
+ * │    abc123-def456-...     │  ← generated value (monospaced bold)
+ * │  [Regenerate]  [Copy]    │
+ * ├──────────────────────────┤
+ * │  Bulk Generation         │  ← optional, collapsible
+ * │  Count: [10] [Generate]  │
+ * │  ┌──────────────────┐   │
+ * │  │ value1           │   │
+ * │  │ value2           │   │
+ * │  └──────────────────┘   │
+ * └──────────────────────────┘
+ * </pre>
+ *
+ * <h3>Subclassing</h3>
+ * <ol>
+ *   <li>Implement {@link #buildConfigurationUi(JPanel)} to add controls
+ *       (combo boxes, spinners, checkboxes) above the generated value.</li>
+ *   <li>Implement {@link #generate()} to return a single generated value.</li>
+ *   <li>Optionally override {@link #supportsBulkGeneration()} to disable
+ *       the bulk panel.</li>
+ * </ol>
+ *
+ * <h3>Persistence</h3>
+ * Configuration properties registered via {@link #registerConfig} are
+ * persisted automatically. The generated value itself is not persisted
+ * (it is regenerated on activation).
  */
 public abstract class OneLineTextGenerator extends DeveloperTool {
 
+    /** Displays the generated value in large monospaced bold text. */
     protected JLabel generatedValueLabel;
+
+    /** Triggers a call to {@link #generate()} and updates the display. */
     protected JButton regenerateButton;
+
+    /** Copies the generated value to the system clipboard. */
     protected JButton copyButton;
+
+    /** Shows error text when {@link #generate()} throws. */
     protected JLabel errorLabel;
+
+    /** Persisted bulk count value. */
     protected ValueProperty<Integer> bulkCount;
+
+    /** Output area for bulk generation results. */
     protected TextEditor bulkOutput;
 
     protected OneLineTextGenerator(ToolConfiguration config) {
@@ -96,34 +135,50 @@ public abstract class OneLineTextGenerator extends DeveloperTool {
         addAdditionalUi(panel);
     }
 
+    /** Generate a new value when the tab is selected. */
     @Override
     public void activated() {
         regenerate();
     }
 
+    // ---------------------------------------------------------------
+    // Subclass contract
+    // ---------------------------------------------------------------
+
     /**
-     * Build the configuration controls above the generated value.
+     * Build the configuration controls (combo boxes, spinners, checkboxes)
+     * that appear above the generated value. Add components to
+     * {@code configPanel} which has a vertical {@link BoxLayout}.
      */
     protected abstract void buildConfigurationUi(JPanel configPanel);
 
     /**
-     * Generate a single value. Called on activation and when the user
-     * clicks "Regenerate".
+     * Generate a single value. Called when the tab is activated and
+     * when the user clicks "Regenerate".
+     *
+     * @return the generated value as a string
+     * @throws Exception if generation fails (error shown in the UI)
      */
     protected abstract String generate() throws Exception;
 
     /**
-     * Whether bulk generation is supported.
+     * Whether to show the bulk generation panel. Default is {@code true}.
+     * Override and return {@code false} for tools where bulk generation
+     * doesn't make sense.
      */
-    protected boolean supportsBulkGeneration() {
-        return true;
-    }
+    protected boolean supportsBulkGeneration() { return true; }
 
     /**
-     * Optional additional UI components.
+     * Hook for adding extra UI elements beyond the standard layout.
+     * {@code panel} has a {@link BorderLayout} — add to any position.
      */
     protected void addAdditionalUi(JPanel panel) {}
 
+    // ---------------------------------------------------------------
+    // Actions
+    // ---------------------------------------------------------------
+
+    /** Call {@link #generate()} and update the display. */
     protected void regenerate() {
         try {
             String value = generate();
@@ -135,6 +190,7 @@ public abstract class OneLineTextGenerator extends DeveloperTool {
         }
     }
 
+    /** Generate {@code bulkCount} values and write them to the bulk editor. */
     protected void generateBulk() {
         int count = bulkCount != null ? bulkCount.get() : 10;
         var sb = new StringBuilder();

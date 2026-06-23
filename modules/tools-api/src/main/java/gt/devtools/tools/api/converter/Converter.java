@@ -12,14 +12,45 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Abstract base for converter tools: a vertical split with source editor,
- * action buttons, and target editor. Supports live (debounced) conversion.
+ * Base class for tools that convert text from one form to another.
+ * Provides a vertical split pane with a source editor on top, an action bar
+ * in the middle, and a target editor at the bottom.
+ *
+ * <h3>Layout</h3>
+ * <pre>
+ * ┌──────────────────────────────┐
+ * │  Source editor (INPUT)       │
+ * ├──────────────────────────────┤
+ * │ [Convert ↓] [✓ Live] [Copy] [↑↓ Swap] │
+ * ├──────────────────────────────┤
+ * │  Target editor (OUTPUT)      │
+ * └──────────────────────────────┘
+ * </pre>
+ *
+ * <h3>Live conversion</h3>
+ * When the "Live" checkbox is checked, every change to the source triggers
+ * a debounced (300ms) conversion on a background thread. Results are
+ * posted back to the target editor on the EDT.
+ *
+ * <h3>Subclassing</h3>
+ * Implement {@link #doConvertForward(byte[])} to provide the conversion
+ * logic. Override {@link #buildActionBar()} to customise the button row.
+ *
+ * <h3>Persistence</h3>
+ * Both source and target text are persisted as {@code INPUT}-type
+ * properties so user work survives restarts.
  */
 public abstract class Converter extends DeveloperTool {
 
+    /** The source (input) editor — editable by the user. */
     protected TextEditor sourceEditor;
+
+    /** The target (output) editor — read-only, shows conversion results. */
     protected TextEditor targetEditor;
+
+    /** Whether live conversion is enabled (persisted). */
     protected final ValueProperty<Boolean> liveConversion;
+
     private final ScheduledExecutorService scheduler =
             Executors.newSingleThreadScheduledExecutor(r -> {
                 Thread t = new Thread(r, "converter-worker");
@@ -33,19 +64,20 @@ public abstract class Converter extends DeveloperTool {
         this.liveConversion = registerConfig("liveConversion", false);
     }
 
+    // ---------------------------------------------------------------
+    // UI construction
+    // ---------------------------------------------------------------
+
     @Override
     protected void buildUi(JPanel panel) {
         var splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setResizeWeight(0.48);
         splitPane.setBorder(null);
 
-        // -- source side
         sourceEditor = createSourceEditor();
         splitPane.setTopComponent(sourceEditor);
 
-        // -- middle: action bar
         JPanel middle = buildActionBar();
-        // target editor
         targetEditor = createTargetEditor();
 
         var rightPanel = new JPanel(new BorderLayout());
@@ -56,6 +88,7 @@ public abstract class Converter extends DeveloperTool {
         panel.add(splitPane, BorderLayout.CENTER);
     }
 
+    /** Create the source editor with a document listener for live mode. */
     protected TextEditor createSourceEditor() {
         var editor = new TextEditor(TextEditor.Mode.INPUT, sourceTextProperty());
         editor.getTextArea().getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -66,12 +99,14 @@ public abstract class Converter extends DeveloperTool {
         return editor;
     }
 
+    /** Create the target editor (read-only). */
     protected TextEditor createTargetEditor() {
         return new TextEditor(TextEditor.Mode.OUTPUT, targetTextProperty());
     }
 
     /**
-     * Build the action button bar between source and target.
+     * Build the action bar between source and target.
+     * Override to add tool-specific buttons.
      */
     protected JPanel buildActionBar() {
         var bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
@@ -96,16 +131,19 @@ public abstract class Converter extends DeveloperTool {
         return bar;
     }
 
+    /** Label for the primary action button. Default: "Convert ↓". */
     protected String getConvertButtonLabel() {
         return "Convert ↓";
     }
 
+    // ---------------------------------------------------------------
+    // Lifecycle
+    // ---------------------------------------------------------------
+
     @Override
     public void activated() {
         liveConversion.addListener(p -> {
-            if (Boolean.TRUE.equals(p.get())) {
-                convert();
-            }
+            if (Boolean.TRUE.equals(p.get())) convert();
         });
     }
 
@@ -115,22 +153,24 @@ public abstract class Converter extends DeveloperTool {
         scheduler.shutdownNow();
     }
 
+    // ---------------------------------------------------------------
+    // Conversion engine
+    // ---------------------------------------------------------------
+
+    /** Called on every source text change; triggers live conversion if enabled. */
     protected void onSourceChanged() {
-        if (Boolean.TRUE.equals(liveConversion.get())) {
-            scheduleConversion();
-        }
+        if (Boolean.TRUE.equals(liveConversion.get())) scheduleConversion();
     }
 
+    /** Debounce: cancel pending work and schedule a new conversion in 300ms. */
     private void scheduleConversion() {
-        if (pendingConversion != null) {
-            pendingConversion.cancel(false);
-        }
+        if (pendingConversion != null) pendingConversion.cancel(false);
         pendingConversion = scheduler.schedule(this::convert, 300, TimeUnit.MILLISECONDS);
     }
 
     /**
-     * Execute conversion synchronously on a background thread then update
-     * the target editor on the EDT.
+     * Run the forward conversion on a background thread and post the
+     * result to the target editor on the EDT.
      */
     public void convert() {
         new SwingWorker<byte[], Void>() {
@@ -138,12 +178,10 @@ public abstract class Converter extends DeveloperTool {
             protected byte[] doInBackground() throws Exception {
                 return doConvertForward(sourceEditor.getBytes());
             }
-
             @Override
             protected void done() {
                 try {
-                    byte[] result = get();
-                    targetEditor.setBytes(result);
+                    targetEditor.setBytes(get());
                 } catch (Exception e) {
                     targetEditor.setText("Error: " + e.getMessage());
                 }
@@ -151,9 +189,7 @@ public abstract class Converter extends DeveloperTool {
         }.execute();
     }
 
-    /**
-     * Swap source and target content.
-     */
+    /** Swap source and target content. */
     protected void swap() {
         String sourceText = sourceEditor.getText();
         String targetText = targetEditor.getText();
@@ -161,22 +197,32 @@ public abstract class Converter extends DeveloperTool {
         targetEditor.setText(sourceText);
     }
 
-    /**
-     * The persisted property key for source text.
-     */
+    // ---------------------------------------------------------------
+    // Persistence
+    // ---------------------------------------------------------------
+
+    /** Property key for persisting source text. */
     protected ValueProperty<String> sourceTextProperty() {
         return registerInput("sourceText", "");
     }
 
-    /**
-     * The persisted property key for target text.
-     */
+    /** Property key for persisting target text. */
     protected ValueProperty<String> targetTextProperty() {
         return registerInput("targetText", "");
     }
 
+    // ---------------------------------------------------------------
+    // Subclass contract
+    // ---------------------------------------------------------------
+
     /**
-     * Subclasses implement the actual forward conversion.
+     * The actual conversion logic. Receives the raw bytes from the
+     * source editor and returns the converted bytes to display in
+     * the target editor.
+     *
+     * @param input source text as UTF-8 bytes
+     * @return converted bytes (will be displayed as UTF-8 text)
+     * @throws Exception on conversion failure (error message shown in target)
      */
     protected abstract byte[] doConvertForward(byte[] input) throws Exception;
 }

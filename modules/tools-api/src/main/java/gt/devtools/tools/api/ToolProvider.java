@@ -3,18 +3,25 @@ package gt.devtools.tools.api;
 import java.util.List;
 
 /**
- * A module-level provider that contributes one or more {@link ToolFactory}
- * instances. Discovered via {@link java.util.ServiceLoader}.
+ * Discovered via {@link java.util.ServiceLoader}. Each module that
+ * contributes tools must implement this interface and declare it in
+ * {@code module-info.java} with
+ * {@code provides ToolProvider with MyProvider;}.
+ *
+ * <h3>Example {@code module-info.java}</h3>
+ * <pre>{@code
+ * provides ToolProvider with EncodersToolProvider;
+ * }</pre>
  */
 public interface ToolProvider {
 
     /**
-     * Human-readable name of this provider (e.g. "Encoders").
+     * Human-readable name for this provider, used in diagnostic output.
      */
     String getName();
 
     /**
-     * The tool factories this provider contributes.
+     * All tool factories contributed by this provider.
      */
     List<ToolFactory<?>> getTools();
 }

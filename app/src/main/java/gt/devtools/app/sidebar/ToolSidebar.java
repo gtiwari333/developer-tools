@@ -49,10 +49,19 @@ public final class ToolSidebar extends JPanel {
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new ToolTreeCellRenderer());
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.addTreeSelectionListener(e -> {
-            var node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-            if (node instanceof ToolTreeNode toolNode) {
-                contentPanel.openTool(toolNode.factory);
+
+        // Use mouse listener so clicking an already-selected node still opens it
+        tree.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                var path = tree.getPathForLocation(e.getX(), e.getY());
+                if (path != null) {
+                    var node = (DefaultMutableTreeNode) path.getLastPathComponent();
+                    if (node instanceof ToolTreeNode toolNode) {
+                        tree.setSelectionPath(path);
+                        contentPanel.openTool(toolNode.factory);
+                    }
+                }
             }
         });
 

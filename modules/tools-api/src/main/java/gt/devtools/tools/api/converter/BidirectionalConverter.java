@@ -6,8 +6,20 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * A bidirectional converter supports both forward and backward conversion
- * (e.g., encode ↔ decode).
+ * A {@link Converter} that works in both directions — forward (encode)
+ * and backward (decode). Adds a second action button and swaps the
+ * source/target semantics for the backward pass.
+ *
+ * <h3>Action bar</h3>
+ * Adds "Encode ↓", "Decode ↑", and copy-both-sides buttons compared
+ * to the base {@link Converter}.
+ *
+ * <h3>Subclassing</h3>
+ * Implement both {@link #doConvertForward} (from {@link Converter})
+ * AND {@link #doConvertBackward}.
+ * <p>
+ * For encoder/decoder tools with standard labels, extend
+ * {@link EncoderDecoder} instead.
  */
 public abstract class BidirectionalConverter extends Converter {
 
@@ -20,9 +32,10 @@ public abstract class BidirectionalConverter extends Converter {
         return "Encode ↓";
     }
 
+    /** Action bar with encode, decode, and copy-both-sides buttons. */
     @Override
     protected JPanel buildActionBar() {
-        var bar = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 8, 4));
+        var bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
 
         var forwardBtn = new JButton("Encode ↓");
         forwardBtn.addActionListener(e -> convert());
@@ -53,7 +66,9 @@ public abstract class BidirectionalConverter extends Converter {
     }
 
     /**
-     * Execute backward (decode) conversion.
+     * Run the backward (decode) conversion: reads bytes from the target
+     * editor, calls {@link #doConvertBackward}, and writes the result
+     * to the source editor.
      */
     public void convertBackward() {
         new SwingWorker<byte[], Void>() {
@@ -61,12 +76,10 @@ public abstract class BidirectionalConverter extends Converter {
             protected byte[] doInBackground() throws Exception {
                 return doConvertBackward(targetEditor.getBytes());
             }
-
             @Override
             protected void done() {
                 try {
-                    byte[] result = get();
-                    sourceEditor.setBytes(result);
+                    sourceEditor.setBytes(get());
                 } catch (Exception e) {
                     sourceEditor.setText("Error: " + e.getMessage());
                 }
@@ -75,7 +88,12 @@ public abstract class BidirectionalConverter extends Converter {
     }
 
     /**
-     * Subclasses implement the backward (decode) conversion.
+     * Backward conversion logic (decode / unescape).
+     * Reads from the target editor, writes to the source editor.
+     *
+     * @param input target text as UTF-8 bytes
+     * @return decoded bytes displayed in the source editor
+     * @throws Exception on conversion failure
      */
     protected abstract byte[] doConvertBackward(byte[] input) throws Exception;
 }
