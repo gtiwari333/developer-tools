@@ -1,0 +1,86 @@
+[
+  {
+    "name": "gt.devtools.app.DevToolsApp",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "gt.devtools.settings.AppSettings",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.EncodersToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.encoders.Base64EncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.Base32EncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.UrlBase64EncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.MimeBase64EncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.AsciiEncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.UrlEncodingEncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.JwtEncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.escape.EscapeToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.crypto.CryptoToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.text.TextToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.formatters.FormattersToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.standalone.StandaloneToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatDarkLaf",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatLightLaf",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.fife.ui.rsyntaxtextarea.RSyntaxTextArea",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  }
+]

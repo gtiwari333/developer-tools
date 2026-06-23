@@ -65,6 +65,10 @@ public final class MainFrame extends JFrame {
                     setJMenuBar(buildMenuBar());
                     revalidate();
                 }
+                // Check for updates in the background after a short delay
+                if (appSettings.isCheckForUpdates()) {
+                    checkForUpdates();
+                }
             }
             @Override
             public void windowClosing(WindowEvent e) {
@@ -127,6 +131,31 @@ public final class MainFrame extends JFrame {
     private String getVersion() {
         String version = getClass().getPackage().getImplementationVersion();
         return version != null ? version : "1.0.0-SNAPSHOT";
+    }
+
+    private void checkForUpdates() {
+        // Delay 3 seconds so the UI is fully painted before network I/O
+        new javax.swing.Timer(3000, e -> {
+            ((javax.swing.Timer) e.getSource()).stop();
+            new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() {
+                    try {
+                        var checker = new gt.devtools.settings.UpdateChecker(
+                                "your-github-user", "developer-tools-desktop", getVersion());
+                        var info = checker.check();
+                        if (info != null) {
+                            SwingUtilities.invokeLater(() ->
+                                    new UpdateDialog(MainFrame.this, info, settingsManager)
+                                            .setVisible(true));
+                        }
+                    } catch (Exception ignored) {
+                        // Network errors are silent — don't bother the user
+                    }
+                    return null;
+                }
+            }.execute();
+        }).start();
     }
 
     private void toggleTheme() {

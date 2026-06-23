@@ -1,0 +1,13 @@
+{
+  "resources": {
+    "includes": [
+      {"pattern": ".*\\.properties$"},
+      {"pattern": ".*\\.xml$"},
+      {"pattern": ".*\\.json$"},
+      {"pattern": ".*\\.png$"},
+      {"pattern": ".*\\.svg$"},
+      {"pattern": ".*\\.ttf$"},
+      {"pattern": "META-INF/services/.*"}
+    ]
+  }
+}
