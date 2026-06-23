@@ -47,8 +47,10 @@ graalvmNative {
                 "-H:IncludeResources=.*\\.png$",
                 "-H:IncludeResources=.*\\.svg$",
                 "-H:IncludeResources=.*\\.ttf$",
+                "-H:IncludeResources=META-INF/services/.*",
                 "-H:+AddAllCharsets",
                 "--initialize-at-build-time=org.slf4j",
+                "-H:ConfigurationFileDirectories=src/main/resources/META-INF/native-image/gt.devtools.app",
                 "-J-Xmx4g"
             )
         }

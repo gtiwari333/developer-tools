@@ -151,6 +151,12 @@ public final class ToolSidebar extends JPanel {
         }
     }
 
+    /** Focus the search field so the user can type to filter. */
+    public void focusSearch() {
+        searchField.requestFocusInWindow();
+        searchField.selectAll();
+    }
+
     public String getSelectedToolId() {
         var node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node instanceof ToolTreeNode tn) {

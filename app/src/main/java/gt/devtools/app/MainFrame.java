@@ -86,6 +86,9 @@ public final class MainFrame extends JFrame {
         splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, e -> {
             appSettings.setDividerLocation(splitPane.getDividerLocation());
         });
+
+        // Keyboard shortcuts
+        setupKeyboardShortcuts();
     }
 
     private JMenuBar buildMenuBar() {
@@ -142,7 +145,7 @@ public final class MainFrame extends JFrame {
                 protected Void doInBackground() {
                     try {
                         var checker = new gt.devtools.settings.UpdateChecker(
-                                "your-github-user", "developer-tools-desktop", getVersion());
+                                "gtiwari333", "developer-tools", getVersion());
                         var info = checker.check();
                         if (info != null) {
                             SwingUtilities.invokeLater(() ->
@@ -168,24 +171,68 @@ public final class MainFrame extends JFrame {
     }
 
     private void openSettings() {
-        JOptionPane.showMessageDialog(this,
-                "Settings dialog coming in a future phase.",
-                "Settings", JOptionPane.INFORMATION_MESSAGE);
+        new SettingsDialog(this, appSettings, settingsManager).setVisible(true);
     }
 
     private void showAbout() {
-        JOptionPane.showMessageDialog(this,
-                """
+        var msg = """
                 Developer Tools Desktop
                 Version %s
 
-                A collection of developer utilities
+                A collection of 40+ developer utilities
                 for everyday programming tasks.
 
                 Built with Java 25, Swing, and FlatLaf.
-                """.formatted(getVersion()),
-                "About Developer Tools",
-                JOptionPane.INFORMATION_MESSAGE);
+                Licensed under MIT License.
+
+                © 2026 The Developer Tools Contributors
+                https://github.com/gtiwari333/developer-tools
+                """.formatted(getVersion());
+        JOptionPane.showMessageDialog(this, msg,
+                "About Developer Tools", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void setupKeyboardShortcuts() {
+        var root = getRootPane();
+        var im = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        var am = root.getActionMap();
+
+        // Ctrl+F — focus sidebar search
+        im.put(KeyStroke.getKeyStroke("ctrl F"), "focusSearch");
+        am.put("focusSearch", new AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) {
+                sidebar.focusSearch();
+            }
+        });
+
+        // Ctrl+N — new workbench in current tool
+        im.put(KeyStroke.getKeyStroke("ctrl N"), "newWorkbench");
+        am.put("newWorkbench", new AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) {
+                var toolId = sidebar.getSelectedToolId();
+                if (toolId != null && !toolId.isEmpty()) {
+                    var factory = gt.devtools.tools.api.ToolRegistry.getInstance().getTool(toolId);
+                    if (factory != null) contentPanel.openToolInNewTab(factory);
+                }
+            }
+        });
+
+        // Ctrl+W — close current tool tab
+        im.put(KeyStroke.getKeyStroke("ctrl W"), "closeTool");
+        am.put("closeTool", new AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) {
+                var toolId = sidebar.getSelectedToolId();
+                if (toolId != null && !toolId.isEmpty()) contentPanel.closeTool(toolId);
+            }
+        });
+
+        // Ctrl+, — open settings
+        im.put(KeyStroke.getKeyStroke("ctrl COMMA"), "openSettings");
+        am.put("openSettings", new AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) {
+                openSettings();
+            }
+        });
     }
 
     private void saveAndExit() {
