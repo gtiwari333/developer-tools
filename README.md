@@ -128,6 +128,71 @@ public final class MyTool extends EncoderDecoder {
 | Build | Gradle + GraalVM Native Build Tools |
 | CI/CD | GitHub Actions |
 
+
+
+## Future plans
+
+#### Low effort
+
+┌───────────────────────┬────────────────────────────────────────────────────────────────────┐
+│         Tool          │                            What it does                            │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ Markdown Preview      │ Edit markdown → see rendered HTML side-by-side                     │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ Random Data Generator │ Generate names, emails, addresses, phone numbers for testing       │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ String Inspector      │ Show Unicode code points, byte representation, character details   │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ Slug Generator        │ Convert text → URL-friendly slugs ("Hello World!" → "hello-world") │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ Checksum Verifier     │ Compute and verify MD5/SHA checksums for files                     │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ IP Subnet Calculator  │ CIDR notation → IP range, broadcast, subnet mask                   │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ Base64 Image Encoder  │ Drag an image → get data:image/png;base64,... string               │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ CSV Viewer            │ Load CSV → sortable/filterable spreadsheet-like table              │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ Environment Variables │ Read system env vars, format as JSON/shell exports                 │
+├───────────────────────┼────────────────────────────────────────────────────────────────────┤
+│ Timer / Stopwatch     │ Simple count-up/count-down timer                                   │
+└───────────────────────┴────────────────────────────────────────────────────────────────────┘
+
+#### Medium Effort
+
+┌────────────────────────┬───────────────────────────────────────────────────────────┐
+│          Tool          │                       What it does                        │
+├────────────────────────┼───────────────────────────────────────────────────────────┤
+│ API Request Tester     │ Send GET/POST requests, set headers/body, see response    │
+├────────────────────────┼───────────────────────────────────────────────────────────┤
+│ SSH Key Generator      │ Generate RSA/Ed25519 key pairs, show fingerprint          │
+├────────────────────────┼───────────────────────────────────────────────────────────┤
+│ GraphQL Formatter      │ Format/minify GraphQL queries, extract operations         │                              
+├────────────────────────┼───────────────────────────────────────────────────────────┤
+│ Mock Data Generator    │ Generate realistic JSON arrays of users, orders, products │
+├────────────────────────┼───────────────────────────────────────────────────────────┤
+│ OAuth2 Token Decoder   │ Decode JWT access tokens, show claims and expiry          │
+├────────────────────────┼───────────────────────────────────────────────────────────┤
+│ Code Snippet Generator │ Java/Kotlin: generate equals/hashCode, builder, toString  │
+├────────────────────────┼───────────────────────────────────────────────────────────┤
+│ Docker Run Generator   │ Fill in fields → get docker run command line              │
+└────────────────────────┴───────────────────────────────────────────────────────────┘
+
+#### Bigger effort
+
+┌───────────────────────────┬──────────────────────────────────────────────────┐
+│           Tool            │                   What it does                   │
+├───────────────────────────┼──────────────────────────────────────────────────┤
+│ Database Schema from JSON │ Paste JSON → generate CREATE TABLE SQL           │
+├───────────────────────────┼──────────────────────────────────────────────────┤
+│ OpenAPI/Swagger Viewer    │ Load OpenAPI spec → browse endpoints and schemas │
+├───────────────────────────┼──────────────────────────────────────────────────┤
+│ Image Converter           │ Resize, convert PNG↔JPG↔WebP, optimize           │
+├───────────────────────────┼──────────────────────────────────────────────────┤
+│ WebSocket Test Client     │ Connect to WS endpoint, send/receive messages    │
+├───────────────────────────┼──────────────────────────────────────────────────┤
+
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) file.
