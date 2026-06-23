@@ -68,6 +68,9 @@ public final class ToolSidebar extends JPanel {
         // Expand groups after tree is created
         expandInitiallyExpanded();
 
+        // Repaint tree when tabs are opened/closed so indicators update
+        contentPanel.addOpenStateListener(() -> tree.repaint());
+
         var scrollPane = new JScrollPane(tree);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
@@ -176,14 +179,22 @@ public final class ToolSidebar extends JPanel {
         }
     }
 
-    private static final class ToolTreeCellRenderer extends DefaultTreeCellRenderer {
+    private final class ToolTreeCellRenderer extends DefaultTreeCellRenderer {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
                                                       boolean sel, boolean expanded,
                                                       boolean leaf, int row, boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            if (value instanceof ToolTreeNode) {
-                setIcon(UIManager.getIcon("Tree.leafIcon"));
+            if (value instanceof ToolTreeNode tn) {
+                // Show a dot indicator (●) if the tool is currently open in a tab
+                if (contentPanel.isToolOpen(tn.factory.getId())) {
+                    setText("● " + tn.factory.getPresentation().menuTitle());
+                    setFont(getFont().deriveFont(Font.BOLD));
+                } else {
+                    setText(tn.factory.getPresentation().menuTitle());
+                    setFont(getFont().deriveFont(Font.PLAIN));
+                }
+                setIcon(null);
             }
             return this;
         }

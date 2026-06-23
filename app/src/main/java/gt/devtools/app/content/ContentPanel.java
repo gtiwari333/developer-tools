@@ -5,7 +5,9 @@ import gt.devtools.tools.api.ToolFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +21,7 @@ public final class ContentPanel extends JPanel {
     private final JTabbedPane tabbedPane;
     private final Map<String, ToolTab> openTabs = new LinkedHashMap<>();
     private final JPanel emptyPanel;
+    private final List<Runnable> openStateListeners = new ArrayList<>();
 
     public ContentPanel(SettingsManager settingsManager) {
         super(new BorderLayout());
@@ -84,6 +87,7 @@ public final class ContentPanel extends JPanel {
         workbench.activate();
         revalidate();
         repaint();
+        fireOpenStateChanged();
     }
 
     private JPanel createTabHeader(ToolFactory<?> factory, WorkbenchTabbedPane workbench, int tabIndex) {
@@ -128,6 +132,8 @@ public final class ContentPanel extends JPanel {
             repaint();
         }
 
+        fireOpenStateChanged();
+
         // Update close button indices for remaining tabs
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             var comp = tabbedPane.getTabComponentAt(i);
@@ -159,6 +165,22 @@ public final class ContentPanel extends JPanel {
     public void saveAllConfigs(SettingsManager sm) {
         for (var tab : openTabs.values()) {
             tab.workbench.saveConfigs(sm);
+        }
+    }
+
+    /** Returns true if the given tool is currently open in a tab. */
+    public boolean isToolOpen(String toolId) {
+        return openTabs.containsKey(toolId);
+    }
+
+    /** Register a listener that fires when tools are opened or closed. */
+    public void addOpenStateListener(Runnable listener) {
+        openStateListeners.add(listener);
+    }
+
+    private void fireOpenStateChanged() {
+        for (var listener : openStateListeners) {
+            listener.run();
         }
     }
 
