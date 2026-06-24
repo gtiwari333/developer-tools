@@ -2,6 +2,12 @@ plugins {
     java
     application
     id("org.graalvm.buildtools.native")
+    id("org.openjfx.javafxplugin")
+}
+
+javafx {
+    version = "23.0.2"
+    modules = listOf("javafx.controls", "javafx.graphics", "javafx.swing")
 }
 
 application {
@@ -15,6 +21,16 @@ application {
 // Never skip the run task — Gradle 9.x may mark it UP-TO-DATE incorrectly
 tasks.named("run") {
     outputs.upToDateWhen { false }
+}
+
+// JavaFX launcher task — Phase 0
+tasks.register<JavaExec>("runFx") {
+    group = "application"
+    description = "Runs the JavaFX shell (Phase 0 migration)"
+    mainClass.set("gt.devtools.app.DevToolsAppFx")
+    mainModule.set("gt.devtools.app")
+    classpath = sourceSets["main"].runtimeClasspath
+    // JavaFX modules are added by the javafx plugin automatically
 }
 
 dependencies {

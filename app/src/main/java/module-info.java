@@ -6,4 +6,11 @@ module gt.devtools.app {
     requires org.fife.RSyntaxTextArea;
     requires java.desktop;
     requires java.net.http;
+
+    // JavaFX (Phase 0 — migration shell)
+    requires transitive javafx.controls;
+    requires transitive javafx.graphics;
+    requires javafx.swing;
+
+    exports gt.devtools.app;
 }

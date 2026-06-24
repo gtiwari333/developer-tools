@@ -1,0 +1,100 @@
+/* Phase 0 dark theme — basic inversion of Modena defaults.
+   Phase 5 will replace with AtlantaFX for richer FlatLaf-like theming. */
+
+.root {
+    -fx-base: #1e1e1e;
+    -fx-background: #1e1e1e;
+
+    -fx-color: derive(-fx-base, 10%);
+    -fx-control-inner-background: #2d2d2d;
+    -fx-control-inner-background-alt: #383838;
+
+    -fx-text-background-color: #d4d4d4;
+    -fx-text-fill: #d4d4d4;
+    -fx-text-base-color: #d4d4d4;
+
+    -fx-accent: #0e639c;
+    -fx-focus-color: #0e639c;
+    -fx-faint-focus-color: #0e639c22;
+
+    -fx-box-border: #3c3c3c;
+    -fx-outer-border: #333333;
+    -fx-inner-border: #454545;
+}
+
+/* TreeView */
+.tree-view {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.tree-cell {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.tree-cell:selected {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+}
+
+.tree-cell:hover {
+    -fx-background-color: derive(-fx-control-inner-background, 10%);
+}
+
+/* SplitPane */
+.split-pane-divider {
+    -fx-background-color: #333333;
+    -fx-padding: 1;
+}
+
+/* TabPane */
+.tab-pane {
+    -fx-background-color: -fx-background;
+}
+
+/* MenuBar */
+.menu-bar {
+    -fx-background-color: #2d2d2d;
+}
+
+.menu:hover, .menu:showing {
+    -fx-background-color: -fx-accent;
+}
+
+.context-menu {
+    -fx-background-color: #2d2d2d;
+}
+
+.menu-item:hover {
+    -fx-background-color: -fx-accent;
+}
+
+/* ScrollPane */
+.scroll-pane {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+/* TextField */
+.text-field {
+    -fx-background-color: -fx-control-inner-background;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.button:hover {
+    -fx-background-color: #4a4a4a;
+}
+
+.button:pressed {
+    -fx-background-color: -fx-accent;
+}
