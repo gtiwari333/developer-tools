@@ -7,6 +7,9 @@ plugins {
 application {
     mainClass.set("gt.devtools.app.DevToolsApp")
     mainModule.set("gt.devtools.app")
+    applicationDefaultJvmArgs = listOf(
+        "--add-reads", "gt.devtools.tools.standalone=ALL-UNNAMED"
+    )
 }
 
 // Never skip the run task — Gradle 9.x may mark it UP-TO-DATE incorrectly

@@ -66,7 +66,9 @@ public final class ToolSidebar extends JPanel {
                     showToolContextMenu(toolNode, e);
                 } else if (e.getClickCount() == 2) {
                     contentPanel.openToolInNewTab(toolNode.factory);
-                } else if (e.getClickCount() == 1) {
+                } else {
+                    // clickCount can be 0 on Linux/X11 when the tree doesn't
+                    // have focus — treat it the same as a single click
                     contentPanel.openTool(toolNode.factory);
                 }
             }
