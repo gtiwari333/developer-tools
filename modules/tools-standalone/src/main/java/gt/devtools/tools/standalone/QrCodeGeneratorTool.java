@@ -79,7 +79,8 @@ public final class QrCodeGeneratorTool extends DeveloperTool {
         public Factory() {}
         @Override public String getId() { return "qr-code-generator"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("qr-code-generator", "QR Code Generator", "QR Code Generator");
+            return ToolPresentation.of("qr-code-generator", "QR Code Generator", "QR Code Generator")
+                    .withGroupId("creativity");
         }
         @Override public QrCodeGeneratorTool create(ToolConfiguration config) { return new QrCodeGeneratorTool(config); }
     }

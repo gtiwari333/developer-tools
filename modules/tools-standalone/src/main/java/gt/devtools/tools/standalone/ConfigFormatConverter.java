@@ -75,7 +75,8 @@ public final class ConfigFormatConverter extends Converter {
         @Override public String getId() { return "config-format-converter"; }
         @Override public ToolPresentation getPresentation() {
             return ToolPresentation.of("config-format-converter",
-                    "Config Format Converter", "Config Format Converter");
+                    "Config Format Converter", "Config Format Converter")
+                    .withGroupId("formatters");
         }
         @Override public ConfigFormatConverter create(ToolConfiguration config) { return new ConfigFormatConverter(config); }
     }

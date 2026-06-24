@@ -122,7 +122,8 @@ public final class UnitConverterTool extends DeveloperTool {
         public Factory() {}
         @Override public String getId() { return "units-converter"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("units-converter", "Unit Converter", "Unit Converter");
+            return ToolPresentation.of("units-converter", "Unit Converter", "Unit Converter")
+                    .withGroupId("formatters");
         }
         @Override public UnitConverterTool create(ToolConfiguration config) { return new UnitConverterTool(config); }
     }

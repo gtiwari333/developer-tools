@@ -101,7 +101,8 @@ public final class HttpServerTool extends DeveloperTool {
         public Factory() {}
         @Override public String getId() { return "http-server"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("http-server", "HTTP Server", "HTTP Server");
+            return ToolPresentation.of("http-server", "HTTP Server", "HTTP Server")
+                    .withGroupId("network");
         }
         @Override public HttpServerTool create(ToolConfiguration config) { return new HttpServerTool(config); }
     }

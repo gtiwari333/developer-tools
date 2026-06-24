@@ -129,7 +129,8 @@ public final class DatetimeConverterTool extends TextTransformer {
         @Override
         public ToolPresentation getPresentation() {
             return ToolPresentation.of("date-time-converter",
-                    "Date / Time Converter", "Date / Time Converter");
+                    "Date / Time Converter", "Date / Time Converter")
+                    .withGroupId("formatters");
         }
         @Override
         public DatetimeConverterTool create(ToolConfiguration config) { return new DatetimeConverterTool(config); }

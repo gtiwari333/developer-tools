@@ -104,6 +104,7 @@ public final class ColorPickerTool extends DeveloperTool {
         @Override public String getId() { return "color-picker"; }
         @Override public ToolPresentation getPresentation() {
             return ToolPresentation.of("color-picker", "Color Picker", "Color Picker")
+                    .withGroupId("creativity")
                     .withDescription("Pick a color, see its hex/RGB/HSL values, copy to clipboard.");
         }
         @Override public ColorPickerTool create(ToolConfiguration config) { return new ColorPickerTool(config); }

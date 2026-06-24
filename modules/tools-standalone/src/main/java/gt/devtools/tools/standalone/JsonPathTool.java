@@ -63,7 +63,8 @@ public final class JsonPathTool extends TextTransformer {
         public Factory() {}
         @Override public String getId() { return "json-path"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("json-path", "JSON Path", "JSON Path Evaluator");
+            return ToolPresentation.of("json-path", "JSON Path", "JSON Path Evaluator")
+                    .withGroupId("text");
         }
         @Override public JsonPathTool create(ToolConfiguration config) { return new JsonPathTool(config); }
     }

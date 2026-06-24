@@ -142,7 +142,16 @@ public final class DevToolsApp {
                 "text", "Text Utilities", "Sort, filter, case-convert, and diff text",
                 4, false));
         registry.registerGroup(new ToolRegistry.ToolGroupDescriptor(
-                "formatters", "Formatters", "Format SQL, config files, and CLI commands",
+                "formatters", "Formatters", "Format SQL, config files, CLI commands, dates, and units",
                 5, false));
+        registry.registerGroup(new ToolRegistry.ToolGroupDescriptor(
+                "creativity", "Creativity", "ASCII art, QR codes, and colour tools",
+                6, false));
+        registry.registerGroup(new ToolRegistry.ToolGroupDescriptor(
+                "network", "Network", "HTTP server and SSL certificate inspection",
+                7, false));
+        registry.registerGroup(new ToolRegistry.ToolGroupDescriptor(
+                "data-inspectors", "Data Inspectors", "Inspect archives, cron expressions, and structured data",
+                8, false));
     }
 }

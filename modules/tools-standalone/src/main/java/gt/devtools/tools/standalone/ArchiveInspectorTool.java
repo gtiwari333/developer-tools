@@ -112,7 +112,8 @@ public final class ArchiveInspectorTool extends DeveloperTool {
         public Factory() {}
         @Override public String getId() { return "unarchiver"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("unarchiver", "Archive Inspector", "Archive Inspector");
+            return ToolPresentation.of("unarchiver", "Archive Inspector", "Archive Inspector")
+                    .withGroupId("data-inspectors");
         }
         @Override public ArchiveInspectorTool create(ToolConfiguration config) { return new ArchiveInspectorTool(config); }
     }

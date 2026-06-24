@@ -62,7 +62,8 @@ public final class CronExpressionTool extends TextTransformer {
         @Override public String getId() { return "cron-expression"; }
         @Override public ToolPresentation getPresentation() {
             return ToolPresentation.of("cron-expression",
-                    "Cron Expression", "Cron Expression Editor");
+                    "Cron Expression", "Cron Expression Editor")
+                    .withGroupId("formatters");
         }
         @Override public CronExpressionTool create(ToolConfiguration config) { return new CronExpressionTool(config); }
     }

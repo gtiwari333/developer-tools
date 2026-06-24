@@ -109,7 +109,8 @@ public final class RegexMatcherTool extends TextTransformer {
         @Override
         public ToolPresentation getPresentation() {
             return ToolPresentation.of("regular-expression-matcher",
-                    "Regex Matcher", "Regular Expression Matcher");
+                    "Regex Matcher", "Regular Expression Matcher")
+                    .withGroupId("text");
         }
         @Override
         public RegexMatcherTool create(ToolConfiguration config) { return new RegexMatcherTool(config); }

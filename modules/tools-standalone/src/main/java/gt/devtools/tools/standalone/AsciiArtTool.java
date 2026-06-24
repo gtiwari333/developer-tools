@@ -64,7 +64,8 @@ public final class AsciiArtTool extends DeveloperTool {
         public Factory() {}
         @Override public String getId() { return "ascii-art"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("ascii-art", "ASCII Art", "ASCII Art Generator");
+            return ToolPresentation.of("ascii-art", "ASCII Art", "ASCII Art Generator")
+                    .withGroupId("creativity");
         }
         @Override public AsciiArtTool create(ToolConfiguration config) { return new AsciiArtTool(config); }
     }

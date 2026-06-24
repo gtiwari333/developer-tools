@@ -98,7 +98,8 @@ public final class ServerCertificatesTool extends DeveloperTool {
         @Override public String getId() { return "certificates-download"; }
         @Override public ToolPresentation getPresentation() {
             return ToolPresentation.of("certificates-download",
-                    "Server Certificates", "Server Certificates");
+                    "Server Certificates", "Server Certificates")
+                    .withGroupId("network");
         }
         @Override public ServerCertificatesTool create(ToolConfiguration config) { return new ServerCertificatesTool(config); }
     }
