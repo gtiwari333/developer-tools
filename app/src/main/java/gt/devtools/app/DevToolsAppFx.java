@@ -80,18 +80,61 @@ public final class DevToolsAppFx extends Application {
 
     private static void applyTheme(Scene scene, String theme) {
         if (!"light".equals(theme)) {
-            // JavaFX module-path resource lookup: module-name:path
-            var moduleCss = "gt.devtools.app:/gt/devtools/app/dark-theme.css";
-            var url = DevToolsAppFx.class.getResource("/gt/devtools/app/dark-theme.css");
-            if (url != null) {
-                scene.getStylesheets().add(url.toExternalForm());
-            } else {
-                System.err.println("JavaFX: dark-theme.css not found via classpath; "
-                        + "trying module-path fallback. "
-                        + "Theme will be fully resolved in Phase 5 with AtlantaFX.");
-            }
+            applyDarkTheme(scene);
         }
     }
+
+    /** Apply dark theme via data URI — avoids JPMS resource-loading issues. */
+    private static void applyDarkTheme(Scene scene) {
+        scene.getRoot().setStyle(DARK_THEME_CSS);
+        // Also add to stylesheets for global application
+        try {
+            var cssBytes = DARK_THEME_CSS.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            var encoded = java.util.Base64.getEncoder().encodeToString(cssBytes);
+            scene.getStylesheets().add("data:text/css;base64," + encoded);
+        } catch (Exception ignored) {}
+    }
+
+    private static final String DARK_THEME_CSS = """
+        .root {
+            -fx-base: #1e1e1e; -fx-background: #1e1e1e;
+            -fx-color: derive(-fx-base, 10%);
+            -fx-control-inner-background: #2d2d2d;
+            -fx-control-inner-background-alt: #383838;
+            -fx-text-background-color: #d4d4d4;
+            -fx-text-fill: #d4d4d4; -fx-text-base-color: #d4d4d4;
+            -fx-accent: #0e639c; -fx-focus-color: #0e639c;
+            -fx-faint-focus-color: #0e639c22;
+            -fx-box-border: #3c3c3c; -fx-outer-border: #333333;
+            -fx-inner-border: #454545;
+        }
+        .tree-view { -fx-background-color: -fx-control-inner-background; }
+        .tree-cell { -fx-background-color: -fx-control-inner-background; -fx-text-fill: -fx-text-base-color; }
+        .tree-cell:selected { -fx-background-color: -fx-accent; -fx-text-fill: white; }
+        .tree-cell:hover { -fx-background-color: derive(-fx-control-inner-background, 10%); }
+        .split-pane-divider { -fx-background-color: #333333; -fx-padding: 1; }
+        .tab-pane { -fx-background-color: -fx-background; }
+        .menu-bar { -fx-background-color: #2d2d2d; }
+        .menu:hover, .menu:showing { -fx-background-color: -fx-accent; }
+        .context-menu { -fx-background-color: #2d2d2d; }
+        .menu-item:hover { -fx-background-color: -fx-accent; }
+        .scroll-pane { -fx-background-color: -fx-control-inner-background; }
+        .text-field { -fx-background-color: -fx-control-inner-background; -fx-text-fill: -fx-text-base-color; }
+        .text-area { -fx-control-inner-background: #2d2d2d; -fx-text-fill: #d4d4d4; }
+        .text-area .content { -fx-background-color: -fx-control-inner-background; }
+        .label { -fx-text-fill: -fx-text-base-color; }
+        .button { -fx-background-color: #3c3c3c; -fx-text-fill: -fx-text-base-color; }
+        .button:hover { -fx-background-color: #4a4a4a; }
+        .button:pressed { -fx-background-color: -fx-accent; }
+        .combo-box { -fx-background-color: #3c3c3c; }
+        .combo-box .list-cell { -fx-text-fill: #d4d4d4; }
+        .check-box { -fx-text-fill: #d4d4d4; }
+        .spinner { -fx-background-color: #3c3c3c; }
+        .spinner .text-field { -fx-background-color: #2d2d2d; -fx-text-fill: #d4d4d4; }
+        .tab { -fx-background-color: #2d2d2d; }
+        .tab:selected { -fx-background-color: #1e1e1e; }
+        .tab-header-background { -fx-background-color: #252525; }
+        """;
 
     private static void registerGroups() {
         var registry = ToolRegistry.getInstance();

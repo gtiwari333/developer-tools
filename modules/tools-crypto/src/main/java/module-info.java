@@ -6,6 +6,7 @@ module gt.devtools.tools.crypto {
     requires java.desktop;
     requires com.fasterxml.uuid;
     requires com.github.f4b6a3.ulid;
+    requires javafx.controls;
 
     exports gt.devtools.tools.crypto;
 

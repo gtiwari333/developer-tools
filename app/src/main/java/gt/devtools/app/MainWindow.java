@@ -2,60 +2,66 @@ package gt.devtools.app;
 
 import gt.devtools.settings.AppSettings;
 import gt.devtools.settings.SettingsManager;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
 /**
- * JavaFX main window — Phase 0 minimal shell.
+ * JavaFX main window — Phase 1 functional shell.
  * <p>
  * Layout:
  * <pre>
- * ┌──────────────────────────────────────┐
- * │  Menu Bar (File, View, Help)         │
- * ├──────────┬───────────────────────────┤
- * │          │                           │
- * │ Sidebar  │    Content Area           │
- * │ (280px)  │    (placeholder)          │
- * │          │                           │
- * ├──────────┴───────────────────────────┤
- * │  Status Bar                          │
- * └──────────────────────────────────────┘
+ * ┌───────────────────────────────────────┐
+ * │  Menu Bar (File, View, Help)          │
+ * ├──────────┬────────────────────────────┤
+ * │          │                            │
+ * │ Sidebar  │    Content Area            │
+ * │ (tree)   │    (tabbed tools)          │
+ * │          │                            │
+ * ├──────────┴────────────────────────────┤
+ * │  Status Bar                           │
+ * └───────────────────────────────────────┘
  * </pre>
  */
 public final class MainWindow extends BorderPane {
 
     private final SettingsManager settingsManager;
     private final AppSettings appSettings;
+    private final FxToolSidebar sidebar;
+    private final FxContentPanel contentPanel;
     private final SplitPane splitPane;
-    private final VBox sidebar;
-    private final BorderPane contentArea;
     private Label statusLabel;
-    private TreeView<String> toolTree;
 
     public MainWindow(SettingsManager settingsManager, AppSettings appSettings) {
         this.settingsManager = settingsManager;
         this.appSettings = appSettings;
 
+        // -- Components
+        contentPanel = new FxContentPanel(settingsManager);
+        sidebar = new FxToolSidebar(contentPanel);
+
         // -- Top: Menu Bar
         setTop(buildMenuBar());
 
         // -- Center: Sidebar + Content split
-        sidebar = buildSidebar();
-        contentArea = buildContentArea();
-
-        splitPane = new SplitPane(sidebar, contentArea);
+        splitPane = new SplitPane(sidebar, contentPanel);
         splitPane.setOrientation(Orientation.HORIZONTAL);
-        splitPane.setDividerPositions(0.22); // ~280px at 1280px width
+        splitPane.setDividerPositions(0.22);
         SplitPane.setResizableWithParent(sidebar, false);
         setCenter(splitPane);
 
         // -- Bottom: Status bar
         setBottom(buildStatusBar());
+
+        // Track sidebar selection for status updates
+        contentPanel.addOpenStateListener(this::updateStatus);
     }
 
     // ---------------------------------------------------------------
@@ -67,136 +73,54 @@ public final class MainWindow extends BorderPane {
 
         var fileMenu = new Menu("File");
         var settingsItem = new MenuItem("Settings");
+        settingsItem.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.CONTROL_DOWN));
         settingsItem.setOnAction(e -> System.out.println("Settings not yet implemented in JavaFX shell"));
         var exitItem = new MenuItem("Exit");
-        exitItem.setOnAction(e -> {
-            saveSettings();
-            javafx.application.Platform.exit();
-            System.exit(0);
-        });
+        exitItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
+        exitItem.setOnAction(e -> saveAndExit());
         fileMenu.getItems().addAll(settingsItem, new SeparatorMenuItem(), exitItem);
 
         var viewMenu = new Menu("View");
+        var searchItem = new MenuItem("Focus Search");
+        searchItem.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN));
+        searchItem.setOnAction(e -> sidebar.focusSearch());
         var themeItem = new MenuItem("Toggle Theme");
         themeItem.setOnAction(e -> {
-            String current = appSettings.getTheme();
-            appSettings.setTheme("dark".equals(current) ? "light" : "dark");
-            // Theme switch would be applied on restart in Phase 0
-            System.out.println("Theme changed to: " + appSettings.getTheme() + " (restart to apply)");
+            appSettings.setTheme("dark".equals(appSettings.getTheme()) ? "light" : "dark");
+            System.out.println("Theme: " + appSettings.getTheme() + " (restart to apply)");
         });
-        viewMenu.getItems().add(themeItem);
+        viewMenu.getItems().addAll(searchItem, new SeparatorMenuItem(), themeItem);
 
         var helpMenu = new Menu("Help");
         var aboutItem = new MenuItem("About");
         aboutItem.setOnAction(e -> {
-            var alert = new Alert(Alert.AlertType.INFORMATION,
-                    "Developer Tools\nJavaFX Edition (Phase 0 Shell)\nVersion 1.0.0-SNAPSHOT");
-            alert.setTitle("About");
-            alert.showAndWait();
+            new Alert(Alert.AlertType.INFORMATION,
+                    "Developer Tools\nJavaFX Edition (Phase 1)\nVersion 1.0.0-SNAPSHOT")
+                    .showAndWait();
         });
         helpMenu.getItems().add(aboutItem);
 
         menuBar.getMenus().addAll(fileMenu, viewMenu, helpMenu);
+
+        // Keyboard shortcuts on the scene
+        menuBar.sceneProperty().addListener((obs, old, scene) -> {
+            if (scene != null) setupKeyboardShortcuts(scene);
+        });
+
         return menuBar;
     }
 
-    // ---------------------------------------------------------------
-    // Sidebar
-    // ---------------------------------------------------------------
-
-    private VBox buildSidebar() {
-        var sidebarPanel = new VBox();
-        sidebarPanel.setPadding(new Insets(8));
-        sidebarPanel.setSpacing(4);
-        sidebarPanel.setMinWidth(240);
-        sidebarPanel.setPrefWidth(280);
-
-        // Search field
-        var searchField = new TextField();
-        searchField.setPromptText("Filter tools...");
-        searchField.textProperty().addListener((obs, old, text) -> filterTree(text));
-        sidebarPanel.getChildren().add(searchField);
-
-        // Tool tree
-        toolTree = buildToolTree();
-        VBox.setVgrow(toolTree, Priority.ALWAYS);
-        sidebarPanel.getChildren().add(toolTree);
-
-        return sidebarPanel;
-    }
-
-    private TreeView<String> buildToolTree() {
-        var registry = gt.devtools.tools.api.ToolRegistry.getInstance();
-
-        var root = new TreeItem<String>("Developer Tools");
-        root.setExpanded(true);
-
-        for (var group : registry.getGroups()) {
-            var groupItem = new TreeItem<String>(group.menuTitle());
-            groupItem.setExpanded(group.initiallyExpanded());
-
-            for (var factory : registry.getToolsByGroup(group.id())) {
-                var toolItem = new TreeItem<String>(
-                        factory.getPresentation().menuTitle());
-                groupItem.getChildren().add(toolItem);
-            }
-            if (!groupItem.getChildren().isEmpty()) {
-                root.getChildren().add(groupItem);
-            }
-        }
-
-        // Ungrouped tools
-        for (String id : registry.getUngroupedToolIds()) {
-            var factory = registry.getTool(id);
-            if (factory != null) {
-                root.getChildren().add(
-                        new TreeItem<String>(factory.getPresentation().menuTitle()));
-            }
-        }
-
-        var tree = new TreeView<String>(root);
-        tree.setShowRoot(false);
-        tree.setCellFactory(tv -> new TreeCell<>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item);
-            }
-        });
-
-        // Single-click selects, would open tool in Phase 2
-        tree.getSelectionModel().selectedItemProperty().addListener(
-                (obs, old, selected) -> {
-                    if (selected != null && selected.isLeaf()) {
-                        statusLabel.setText("Selected: " + selected.getValue()
-                                + " (tool opening in Phase 2)");
-                    }
+    private void setupKeyboardShortcuts(Scene scene) {
+        // Ctrl+F → focus search
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
+                sidebar::focusSearch);
+        // Ctrl+W → close current tab
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN),
+                () -> {
+                    // Close current tab — handled via TabPane close
                 });
-
-        return tree;
-    }
-
-    private void filterTree(String query) {
-        // Phase 1 will implement full filter logic; Phase 0 skeleton
-        if (query == null || query.isEmpty()) {
-            // Reset tree — rebuild from registry
-            // (Simplified for Phase 0)
-        }
-    }
-
-    // ---------------------------------------------------------------
-    // Content Area
-    // ---------------------------------------------------------------
-
-    private BorderPane buildContentArea() {
-        var area = new BorderPane();
-        area.setPadding(new Insets(16));
-
-        var placeholder = new Label("Select a tool from the sidebar to begin.");
-        placeholder.setStyle("-fx-text-fill: -fx-text-background-color; -fx-font-size: 14px;");
-        area.setCenter(placeholder);
-
-        return area;
     }
 
     // ---------------------------------------------------------------
@@ -216,11 +140,21 @@ public final class MainWindow extends BorderPane {
         return bar;
     }
 
+    private void updateStatus() {
+        int count = 0;
+        // Count open tools via ToolRegistry + contentPanel
+        var registry = gt.devtools.tools.api.ToolRegistry.getInstance();
+        for (var factory : registry.getAllTools()) {
+            if (contentPanel.isToolOpen(factory.getId())) count++;
+        }
+        statusLabel.setText(count == 0 ? "Ready"
+                : count + " tool" + (count != 1 ? "s" : "") + " open");
+    }
+
     // ---------------------------------------------------------------
     // Persistence
     // ---------------------------------------------------------------
 
-    /** Save window geometry and settings before exit. */
     public void saveSettings() {
         var stage = (javafx.stage.Stage) getScene().getWindow();
         appSettings.setWindowWidth((int) stage.getWidth());
@@ -229,6 +163,15 @@ public final class MainWindow extends BorderPane {
         appSettings.setWindowY((int) stage.getY());
         appSettings.setDividerLocation((int) (splitPane.getDividerPositions()[0]
                 * getScene().getWidth()));
+
+        contentPanel.saveAllConfigs(settingsManager);
+        settingsManager.saveAppSettings(appSettings);
         System.out.println("JavaFX: Settings saved.");
+    }
+
+    private void saveAndExit() {
+        saveSettings();
+        Platform.exit();
+        System.exit(0);
     }
 }
