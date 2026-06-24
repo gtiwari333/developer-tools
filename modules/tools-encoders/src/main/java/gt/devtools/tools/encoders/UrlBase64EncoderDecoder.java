@@ -19,13 +19,16 @@ public final class UrlBase64EncoderDecoder extends EncoderDecoder {
 
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        return Base64.getUrlEncoder().encode(input);
+        return encode(input);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) {
-        return Base64.getUrlDecoder().decode(input);
+        return decode(input);
     }
+
+    public static byte[] encode(byte[] input) { return java.util.Base64.getUrlEncoder().encode(input); }
+    public static byte[] decode(byte[] input) { return java.util.Base64.getUrlDecoder().decode(input); }
 
     public static final class Factory implements ToolFactory<UrlBase64EncoderDecoder> {
         public Factory() {}

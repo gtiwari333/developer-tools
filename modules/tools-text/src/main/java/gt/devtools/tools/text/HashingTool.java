@@ -8,7 +8,6 @@ import gt.devtools.tools.api.text.TextTransformer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.security.MessageDigest;
 
 /**
  * Computes cryptographic hashes (MD5, SHA-1, SHA-256, SHA-384, SHA-512).
@@ -45,7 +44,14 @@ public final class HashingTool extends TextTransformer {
 
     @Override
     protected String doTransform(String input) throws Exception {
-        var md = MessageDigest.getInstance(algorithm.get());
+        return hash(input, algorithm.get());
+    }
+
+    // -- public static method (testable without Swing)
+
+    /** Computes a cryptographic hash of the input and returns it as a hex string. */
+    public static String hash(String input, String algorithm) throws Exception {
+        var md = java.security.MessageDigest.getInstance(algorithm);
         byte[] digest = md.digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         var sb = new StringBuilder();
         for (byte b : digest) sb.append(String.format("%02x", b & 0xff));

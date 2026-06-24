@@ -19,13 +19,16 @@ public final class MimeBase64EncoderDecoder extends EncoderDecoder {
 
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        return Base64.getMimeEncoder().encode(input);
+        return encode(input);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) {
-        return Base64.getMimeDecoder().decode(input);
+        return decode(input);
     }
+
+    public static byte[] encode(byte[] input) { return java.util.Base64.getMimeEncoder().encode(input); }
+    public static byte[] decode(byte[] input) { return java.util.Base64.getMimeDecoder().decode(input); }
 
     public static final class Factory implements ToolFactory<MimeBase64EncoderDecoder> {
         public Factory() {}

@@ -6,12 +6,8 @@ import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolPresentation;
 import gt.devtools.tools.api.text.TextTransformer;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import java.awt.*;
-import java.nio.charset.StandardCharsets;
-import java.util.HexFormat;
 
 /**
  * Computes HMAC (Hash-based Message Authentication Code) with
@@ -54,12 +50,19 @@ public final class HmacTool extends TextTransformer {
 
     @Override
     protected String doTransform(String input) throws Exception {
-        String key = secret.get();
-        if (key == null || key.isEmpty()) throw new IllegalStateException("Secret key is required");
-        var mac = Mac.getInstance(algorithm.get());
-        mac.init(new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algorithm.get()));
-        byte[] result = mac.doFinal(input.getBytes(StandardCharsets.UTF_8));
-        return HexFormat.of().formatHex(result);
+        return hmac(input, algorithm.get(), secret.get());
+    }
+
+    // -- public static method (testable without Swing)
+
+    /** Computes an HMAC of the input with the given algorithm and secret key. */
+    public static String hmac(String input, String algorithm, String secret) throws Exception {
+        if (secret == null || secret.isEmpty()) throw new IllegalStateException("Secret key is required");
+        var mac = javax.crypto.Mac.getInstance(algorithm);
+        mac.init(new javax.crypto.spec.SecretKeySpec(
+                secret.getBytes(java.nio.charset.StandardCharsets.UTF_8), algorithm));
+        byte[] result = mac.doFinal(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        return java.util.HexFormat.of().formatHex(result);
     }
 
     public static final class Factory implements ToolFactory<HmacTool> {

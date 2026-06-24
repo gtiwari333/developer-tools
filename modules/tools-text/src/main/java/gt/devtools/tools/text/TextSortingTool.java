@@ -8,7 +8,6 @@ import gt.devtools.tools.api.text.TextTransformer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
 /**
  * Sorts lines of text in ascending or descending order.
@@ -42,12 +41,25 @@ public final class TextSortingTool extends TextTransformer {
 
     @Override
     protected String doTransform(String input) {
-        String[] lines = input.split("\n");
         if ("Descending".equals(direction.get())) {
-            Arrays.sort(lines, java.util.Comparator.reverseOrder());
-        } else {
-            Arrays.sort(lines);
+            return sortDescending(input);
         }
+        return sortAscending(input);
+    }
+
+    // -- public static sort methods (testable without Swing)
+
+    /** Sorts lines alphabetically in ascending order. */
+    public static String sortAscending(String input) {
+        String[] lines = input.split("\n");
+        java.util.Arrays.sort(lines);
+        return String.join("\n", lines);
+    }
+
+    /** Sorts lines alphabetically in descending order. */
+    public static String sortDescending(String input) {
+        String[] lines = input.split("\n");
+        java.util.Arrays.sort(lines, java.util.Comparator.reverseOrder());
         return String.join("\n", lines);
     }
 

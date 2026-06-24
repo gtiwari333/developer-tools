@@ -35,7 +35,14 @@ subprojects {
         ))
     }
 
+    dependencies {
+        testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
+        testImplementation("org.assertj:assertj-core:3.27.3")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    }
+
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+        // Per-module --add-opens configured in the module's build.gradle.kts
     }
 }

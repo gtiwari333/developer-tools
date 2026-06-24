@@ -15,14 +15,21 @@ public final class CsvTextEscaperUnescaper extends EscaperUnescaper {
 
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        return StringEscapeUtils.escapeCsv(
-                new String(input, StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+        return escape(new String(input, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) {
-        return StringEscapeUtils.unescapeCsv(
-                new String(input, StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+        return unescape(new String(input, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    public static String escape(String input) {
+        return org.apache.commons.text.StringEscapeUtils.escapeCsv(input);
+    }
+    public static String unescape(String input) {
+        return org.apache.commons.text.StringEscapeUtils.unescapeCsv(input);
     }
 
     public static final class Factory implements ToolFactory<CsvTextEscaperUnescaper> {

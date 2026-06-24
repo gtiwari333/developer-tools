@@ -65,10 +65,8 @@ public final class UnitConverterTool extends DeveloperTool {
                 showNumberBases((long) value);
             } else {
                 int base = cat.contains("1000") ? 1000 : 1024;
-                String[] units = {"bytes", "KB", "MB", "GB", "TB", "PB"};
-                for (int i = 0; i < units.length; i++) {
-                    double v = value / Math.pow(base, i);
-                    addResult(units[i], v);
+                for (var entry : convertDataSize(value, base).entrySet()) {
+                    addResult(entry.getKey(), entry.getValue());
                 }
             }
         } catch (NumberFormatException e) {
@@ -80,11 +78,32 @@ public final class UnitConverterTool extends DeveloperTool {
 
     private void showNumberBases(long n) {
         var mono = new Font(Font.MONOSPACED, Font.PLAIN, 13);
-        addLabel("Binary:     " + Long.toBinaryString(n), mono);
-        addLabel("Octal:      " + Long.toOctalString(n), mono);
-        addLabel("Decimal:    " + n, mono);
-        addLabel("Hex:        " + Long.toHexString(n).toUpperCase(), mono);
-        addLabel("Hex (0x):   0x" + Long.toHexString(n).toUpperCase(), mono);
+        for (String line : convertNumberBases(n)) {
+            addLabel(line, mono);
+        }
+    }
+
+    // -- public static methods (testable without Swing)
+
+    /** Converts a byte value to all data-size units using the given base (1024 or 1000). */
+    public static java.util.Map<String, Double> convertDataSize(double bytes, int base) {
+        java.util.Map<String, Double> result = new java.util.LinkedHashMap<>();
+        String[] units = {"bytes", "KB", "MB", "GB", "TB", "PB"};
+        for (int i = 0; i < units.length; i++) {
+            result.put(units[i], bytes / Math.pow(base, i));
+        }
+        return result;
+    }
+
+    /** Converts a number to binary, octal, decimal, and hex representations. */
+    public static java.util.List<String> convertNumberBases(long n) {
+        return java.util.List.of(
+                "Binary:     " + Long.toBinaryString(n),
+                "Octal:      " + Long.toOctalString(n),
+                "Decimal:    " + n,
+                "Hex:        " + Long.toHexString(n).toUpperCase(),
+                "Hex (0x):   0x" + Long.toHexString(n).toUpperCase()
+        );
     }
 
     private void addResult(String unit, double value) {

@@ -1,6 +1,5 @@
 package gt.devtools.tools.text;
 
-import gt.devtools.common.ValueProperty;
 import gt.devtools.settings.ToolConfiguration;
 import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolPresentation;
@@ -9,8 +8,6 @@ import gt.devtools.tools.api.text.TextTransformer;
 import javax.swing.*;
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 
 /**
  * Displays text statistics: character/word/line/byte counts, unique words,
@@ -20,6 +17,43 @@ public final class TextStatisticsTool extends TextTransformer {
 
     private TextStatisticsTool(ToolConfiguration config) {
         super(config);
+    }
+
+    // -- public value type (testable without Swing)
+
+    /** Immutable snapshot of text statistics. */
+    public record TextStats(int charCount, int charCountNoSpaces, int wordCount,
+                            int uniqueWordCount, int lineCount, int byteCountUtf8) {
+
+        /** Formats the statistics as a human-readable report. */
+        public String format() {
+            return """
+                   Character count (with spaces):  %,d
+                   Character count (no spaces):   %,d
+                   Word count:                    %,d
+                   Unique words:                  %,d
+                   Line count:                    %,d
+                   Byte count (UTF-8):            %,d
+                   """.formatted(charCount, charCountNoSpaces, wordCount,
+                    uniqueWordCount, lineCount, byteCountUtf8);
+        }
+    }
+
+    /** Computes text statistics from the given input string. */
+    public static TextStats computeStats(String input) {
+        if (input.isEmpty()) return null;
+
+        int chars = input.length();
+        int charsNoSpaces = input.replaceAll("\\s", "").length();
+        String[] lines = input.split("\n", -1);
+        int lineCount = lines.length;
+        String[] words = input.trim().split("\\s+");
+        int wordCount = input.trim().isEmpty() ? 0 : words.length;
+        int byteCount = input.getBytes(StandardCharsets.UTF_8).length;
+        int uniqueWords = java.util.Arrays.stream(words).collect(
+                java.util.stream.Collectors.toCollection(java.util.LinkedHashSet::new)).size();
+
+        return new TextStats(chars, charsNoSpaces, wordCount, uniqueWords, lineCount, byteCount);
     }
 
     @Override
@@ -36,24 +70,7 @@ public final class TextStatisticsTool extends TextTransformer {
     @Override
     protected String doTransform(String input) {
         if (input.isEmpty()) return "Enter text on the left to see statistics.";
-
-        int chars = input.length();
-        int charsNoSpaces = input.replaceAll("\\s", "").length();
-        String[] lines = input.split("\n", -1);
-        int lineCount = lines.length;
-        String[] words = input.trim().split("\\s+");
-        int wordCount = input.trim().isEmpty() ? 0 : words.length;
-        int byteCount = input.getBytes(StandardCharsets.UTF_8).length;
-        var uniqueWords = new LinkedHashSet<>(Arrays.asList(words));
-
-        return """
-               Character count (with spaces):  %,d
-               Character count (no spaces):   %,d
-               Word count:                    %,d
-               Unique words:                  %,d
-               Line count:                    %,d
-               Byte count (UTF-8):            %,d
-               """.formatted(chars, charsNoSpaces, wordCount, uniqueWords.size(), lineCount, byteCount);
+        return computeStats(input).format();
     }
 
     public static final class Factory implements ToolFactory<TextStatisticsTool> {

@@ -8,9 +8,7 @@ import gt.devtools.tools.api.generator.OneLineTextGenerator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
+// SecureRandom, ArrayList, List used via FQN in static methods
 
 /**
  * Generates random passwords with configurable length and character classes.
@@ -65,20 +63,41 @@ public final class PasswordGeneratorTool extends OneLineTextGenerator {
 
     @Override
     protected String generate() {
-        List<String> pools = new ArrayList<>();
-        if (useUpper.get()) pools.add(UPPER);
-        if (useLower.get()) pools.add(LOWER);
-        if (useDigits.get()) pools.add(DIGITS);
-        if (useSymbols.get()) pools.add(SYMBOLS);
-        if (pools.isEmpty()) pools.add(LOWER); // at least lowercase
+        return generate(length.get(), useUpper.get(), useLower.get(),
+                useDigits.get(), useSymbols.get());
+    }
+
+    // -- public static methods (testable without Swing)
+
+    /** Generates a random password with the given constraints. */
+    public static String generate(int length, boolean upper, boolean lower,
+                                  boolean digits, boolean symbols) {
+        var pools = new java.util.ArrayList<String>();
+        if (upper) pools.add(UPPER);
+        if (lower) pools.add(LOWER);
+        if (digits) pools.add(DIGITS);
+        if (symbols) pools.add(SYMBOLS);
+        if (pools.isEmpty()) pools.add(LOWER);
 
         String chars = String.join("", pools);
-        var rng = new SecureRandom();
-        var sb = new StringBuilder(length.get());
-        for (int i = 0; i < length.get(); i++) {
+        var rng = new java.security.SecureRandom();
+        var sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
             sb.append(chars.charAt(rng.nextInt(chars.length())));
         }
         return sb.toString();
+    }
+
+    /** Returns the pool of characters available given the constraints. */
+    public static String charPool(boolean upper, boolean lower,
+                                  boolean digits, boolean symbols) {
+        var pools = new java.util.ArrayList<String>();
+        if (upper) pools.add(UPPER);
+        if (lower) pools.add(LOWER);
+        if (digits) pools.add(DIGITS);
+        if (symbols) pools.add(SYMBOLS);
+        if (pools.isEmpty()) pools.add(LOWER);
+        return String.join("", pools);
     }
 
     public static final class Factory implements ToolFactory<PasswordGeneratorTool> {

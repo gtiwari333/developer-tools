@@ -40,12 +40,24 @@ public final class NanoIdGeneratorTool extends OneLineTextGenerator {
 
     @Override
     protected String generate() {
-        var rng = new SecureRandom();
-        var sb = new StringBuilder(length.get());
-        for (int i = 0; i < length.get(); i++) {
+        return generate(length.get());
+    }
+
+    // -- public static method (testable without Swing)
+
+    /** Generates a Nano ID of the given length using the default alphabet. */
+    public static String generate(int length) {
+        var rng = new java.security.SecureRandom();
+        var sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
             sb.append(ALPHABET[rng.nextInt(ALPHABET.length)]);
         }
         return sb.toString();
+    }
+
+    /** Returns the default Nano ID alphabet (64 URL-safe characters). */
+    public static char[] alphabet() {
+        return ALPHABET.clone();
     }
 
     public static final class Factory implements ToolFactory<NanoIdGeneratorTool> {

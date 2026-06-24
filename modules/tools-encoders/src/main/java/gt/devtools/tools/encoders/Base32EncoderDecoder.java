@@ -20,13 +20,16 @@ public final class Base32EncoderDecoder extends EncoderDecoder {
 
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        return codec.encode(input);
+        return encode(input);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) {
-        return codec.decode(input);
+        return decode(input);
     }
+
+    public byte[] encode(byte[] input) { return codec.encode(input); }
+    public byte[] decode(byte[] input) { return codec.decode(input); }
 
     public static final class Factory implements ToolFactory<Base32EncoderDecoder> {
         public Factory() {}

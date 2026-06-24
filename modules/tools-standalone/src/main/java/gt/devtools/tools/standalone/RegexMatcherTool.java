@@ -8,8 +8,7 @@ import gt.devtools.tools.api.text.TextTransformer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+// Matcher/Pattern used via FQN in static methods
 
 /**
  * Tests regular expressions against input text. Shows matches, groups,
@@ -63,33 +62,45 @@ public final class RegexMatcherTool extends TextTransformer {
     protected String doTransform(String input) {
         String pat = pattern.get();
         if (pat.isEmpty()) return "Enter a regex pattern above.";
-
         try {
             return switch (mode.get()) {
-                case "Find matches" -> {
-                    Matcher m = Pattern.compile(pat).matcher(input);
-                    var sb = new StringBuilder();
-                    int count = 0;
-                    while (m.find()) {
-                        count++;
-                        sb.append("Match ").append(count).append(": ").append(m.group()).append("\n");
-                        for (int i = 1; i <= m.groupCount(); i++) {
-                            sb.append("  Group ").append(i).append(": ").append(m.group(i)).append("\n");
-                        }
-                    }
-                    yield count == 0 ? "No matches found." : sb.toString();
-                }
-                case "Replace" -> Pattern.compile(pat).matcher(input)
-                        .replaceAll(replacement.get());
-                case "Split" -> {
-                    String[] parts = Pattern.compile(pat).split(input);
-                    yield String.join("\n", parts);
-                }
+                case "Find matches" -> findMatches(input, pat);
+                case "Replace" -> replaceAll(input, pat, replacement.get());
+                case "Split" -> split(input, pat);
                 default -> input;
             };
         } catch (Exception e) {
             return "Regex error: " + e.getMessage();
         }
+    }
+
+    // -- public static methods (testable without Swing)
+
+    /** Finds all regex matches and returns them with group details. */
+    public static String findMatches(String input, String pattern) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(pattern).matcher(input);
+        var sb = new StringBuilder();
+        int count = 0;
+        while (m.find()) {
+            count++;
+            sb.append("Match ").append(count).append(": ").append(m.group()).append("\n");
+            for (int i = 1; i <= m.groupCount(); i++) {
+                sb.append("  Group ").append(i).append(": ").append(m.group(i)).append("\n");
+            }
+        }
+        return count == 0 ? "No matches found." : sb.toString();
+    }
+
+    /** Replaces all regex matches with the given replacement string. */
+    public static String replaceAll(String input, String pattern, String replacement) {
+        return java.util.regex.Pattern.compile(pattern).matcher(input)
+                .replaceAll(replacement);
+    }
+
+    /** Splits the input by the given regex pattern. */
+    public static String split(String input, String pattern) {
+        String[] parts = java.util.regex.Pattern.compile(pattern).split(input);
+        return String.join("\n", parts);
     }
 
     public static final class Factory implements ToolFactory<RegexMatcherTool> {

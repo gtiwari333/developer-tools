@@ -8,9 +8,6 @@ import gt.devtools.tools.api.text.TextTransformer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.regex.Pattern;
 
 /**
  * Filters lines of text: include/exclude by regex, deduplicate,
@@ -55,27 +52,47 @@ public final class TextFilterTool extends TextTransformer {
 
     @Override
     protected String doTransform(String input) {
-        String[] lines = input.split("\n");
         return switch (mode.get()) {
-            case "Include matching" -> {
-                var p = Pattern.compile(pattern.get());
-                yield String.join("\n", Arrays.stream(lines).filter(l -> p.matcher(l).find()).toList());
-            }
-            case "Exclude matching" -> {
-                var p = Pattern.compile(pattern.get());
-                yield String.join("\n", Arrays.stream(lines).filter(l -> !p.matcher(l).find()).toList());
-            }
-            case "Unique lines" -> {
-                var set = new LinkedHashSet<>(Arrays.asList(lines));
-                yield String.join("\n", set);
-            }
-            case "Trim whitespace" -> {
-                var sb = new StringBuilder();
-                for (String l : lines) sb.append(l.strip()).append("\n");
-                yield sb.toString().stripTrailing();
-            }
-            default -> input;
+            case "Include matching" -> filterInclude(input, pattern.get());
+            case "Exclude matching" -> filterExclude(input, pattern.get());
+            case "Unique lines"     -> filterUnique(input);
+            case "Trim whitespace"  -> trimLines(input);
+            default                 -> input;
         };
+    }
+
+    // -- public static filter methods (testable without Swing)
+
+    /** Returns only lines that match the given regex pattern. */
+    public static String filterInclude(String input, String regex) {
+        var p = java.util.regex.Pattern.compile(regex);
+        return String.join("\n",
+                java.util.Arrays.stream(input.split("\n"))
+                        .filter(l -> p.matcher(l).find())
+                        .toList());
+    }
+
+    /** Returns only lines that do NOT match the given regex pattern. */
+    public static String filterExclude(String input, String regex) {
+        var p = java.util.regex.Pattern.compile(regex);
+        return String.join("\n",
+                java.util.Arrays.stream(input.split("\n"))
+                        .filter(l -> !p.matcher(l).find())
+                        .toList());
+    }
+
+    /** Deduplicates lines, preserving first occurrence order. */
+    public static String filterUnique(String input) {
+        var set = new java.util.LinkedHashSet<>(
+                java.util.Arrays.asList(input.split("\n")));
+        return String.join("\n", set);
+    }
+
+    /** Strips leading/trailing whitespace from each line. */
+    public static String trimLines(String input) {
+        var sb = new StringBuilder();
+        for (String l : input.split("\n")) sb.append(l.strip()).append("\n");
+        return sb.toString().stripTrailing();
     }
 
     public static final class Factory implements ToolFactory<TextFilterTool> {

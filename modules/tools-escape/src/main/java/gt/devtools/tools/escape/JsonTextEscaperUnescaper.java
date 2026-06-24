@@ -15,14 +15,21 @@ public final class JsonTextEscaperUnescaper extends EscaperUnescaper {
 
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        return StringEscapeUtils.escapeJson(
-                new String(input, StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+        return escape(new String(input, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) {
-        return StringEscapeUtils.unescapeJson(
-                new String(input, StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+        return unescape(new String(input, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    public static String escape(String input) {
+        return org.apache.commons.text.StringEscapeUtils.escapeJson(input);
+    }
+    public static String unescape(String input) {
+        return org.apache.commons.text.StringEscapeUtils.unescapeJson(input);
     }
 
     public static final class Factory implements ToolFactory<JsonTextEscaperUnescaper> {

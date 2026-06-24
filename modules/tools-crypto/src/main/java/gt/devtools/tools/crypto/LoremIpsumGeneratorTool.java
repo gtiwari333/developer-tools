@@ -64,7 +64,10 @@ public final class LoremIpsumGeneratorTool extends OneLineTextGenerator {
         };
     }
 
-    private String generateParagraphs(int n) {
+    // -- public static generation methods (testable without Swing)
+
+    /** Generates a specified number of lorem ipsum paragraphs. */
+    public static String generateParagraphs(int n) {
         var sb = new StringBuilder();
         for (int p = 0; p < n; p++) {
             sb.append(generateSentences(3 + rng().nextInt(5)));
@@ -73,7 +76,8 @@ public final class LoremIpsumGeneratorTool extends OneLineTextGenerator {
         return sb.toString();
     }
 
-    private String generateSentences(int n) {
+    /** Generates a specified number of lorem ipsum sentences. */
+    public static String generateSentences(int n) {
         var sb = new StringBuilder();
         for (int s = 0; s < n; s++) {
             int wordCount = 5 + rng().nextInt(12);
@@ -88,7 +92,8 @@ public final class LoremIpsumGeneratorTool extends OneLineTextGenerator {
         return sb.toString().strip();
     }
 
-    private String generateWords(int n) {
+    /** Generates a specified number of lorem ipsum words. */
+    public static String generateWords(int n) {
         var sb = new StringBuilder();
         for (int w = 0; w < n; w++) {
             sb.append(WORDS[rng().nextInt(WORDS.length)]);
@@ -97,7 +102,12 @@ public final class LoremIpsumGeneratorTool extends OneLineTextGenerator {
         return sb.toString();
     }
 
-    private static RandomGenerator rng() { return RandomGenerator.getDefault(); }
+    /** Returns the lorem ipsum word list. */
+    public static String[] wordList() {
+        return WORDS.clone();
+    }
+
+    private static java.util.random.RandomGenerator rng() { return java.util.random.RandomGenerator.getDefault(); }
 
     /** Bulk output is text-based, not single-line, so we override bulk to join paragraphs cleanly. */
     @Override

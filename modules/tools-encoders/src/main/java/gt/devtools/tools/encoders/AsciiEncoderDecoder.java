@@ -16,24 +16,36 @@ public final class AsciiEncoderDecoder extends EncoderDecoder {
         super(config);
     }
 
-    @Override
-    protected byte[] doConvertForward(byte[] input) {
+    // -- public static conversion methods (testable without Swing)
+
+    /** Encodes byte array to lowercase hex string (e.g. [0x61, 0x62] → "616263"). */
+    public static String encodeHex(byte[] input) {
         StringBuilder hex = new StringBuilder(input.length * 2);
         for (byte b : input) {
             hex.append(String.format("%02x", b & 0xff));
         }
-        return hex.toString().getBytes(StandardCharsets.UTF_8);
+        return hex.toString();
+    }
+
+    /** Decodes a hex string back to bytes. Strips whitespace before decoding. */
+    public static byte[] decodeHex(String hex) {
+        String clean = hex.replaceAll("\\s", "");
+        if (clean.length() % 2 != 0) throw new IllegalArgumentException("Odd hex length");
+        byte[] result = new byte[clean.length() / 2];
+        for (int i = 0; i < clean.length(); i += 2) {
+            result[i / 2] = (byte) Integer.parseInt(clean.substring(i, i + 2), 16);
+        }
+        return result;
+    }
+
+    @Override
+    protected byte[] doConvertForward(byte[] input) {
+        return encodeHex(input).getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) throws Exception {
-        String hex = new String(input, StandardCharsets.UTF_8).replaceAll("\\s", "");
-        if (hex.length() % 2 != 0) throw new IllegalArgumentException("Odd hex length");
-        byte[] result = new byte[hex.length() / 2];
-        for (int i = 0; i < hex.length(); i += 2) {
-            result[i / 2] = (byte) Integer.parseInt(hex.substring(i, i + 2), 16);
-        }
-        return result;
+        return decodeHex(new String(input, StandardCharsets.UTF_8));
     }
 
     public static final class Factory implements ToolFactory<AsciiEncoderDecoder> {

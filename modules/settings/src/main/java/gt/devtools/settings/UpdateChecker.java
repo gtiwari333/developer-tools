@@ -59,10 +59,14 @@ public final class UpdateChecker {
         return null;
     }
 
-    private boolean isNewer(String tag) {
-        if (tag == null) return false;
+    /**
+     * Compares two semver version strings (e.g. "1.2.3" vs "1.2.4").
+     * Handles 'v' prefix and pre-release suffixes.
+     */
+    public static boolean isNewer(String currentVersion, String latestTag) {
+        if (latestTag == null) return false;
         // Strip 'v' prefix
-        String latest = tag.startsWith("v") ? tag.substring(1) : tag;
+        String latest = latestTag.startsWith("v") ? latestTag.substring(1) : latestTag;
         String current = currentVersion.contains("-")
                 ? currentVersion.split("-")[0] : currentVersion;
         // Simple semver comparison: split by dots and compare numerically
@@ -76,6 +80,10 @@ public final class UpdateChecker {
             if (l < c) return false;
         }
         return false;
+    }
+
+    private boolean isNewer(String tag) {
+        return isNewer(currentVersion, tag);
     }
 
     /** Metadata about an available update. */

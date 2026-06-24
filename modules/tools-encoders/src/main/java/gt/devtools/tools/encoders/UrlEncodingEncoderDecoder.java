@@ -21,16 +21,24 @@ public final class UrlEncodingEncoderDecoder extends EncoderDecoder {
 
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        String encoded = URLEncoder.encode(new String(input, StandardCharsets.UTF_8),
-                StandardCharsets.UTF_8);
-        return encoded.getBytes(StandardCharsets.UTF_8);
+        return encode(input);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) throws Exception {
-        String decoded = URLDecoder.decode(new String(input, StandardCharsets.UTF_8),
-                StandardCharsets.UTF_8);
-        return decoded.getBytes(StandardCharsets.UTF_8);
+        return decode(input);
+    }
+
+    public static byte[] encode(byte[] input) {
+        String encoded = java.net.URLEncoder.encode(new String(input, java.nio.charset.StandardCharsets.UTF_8),
+                java.nio.charset.StandardCharsets.UTF_8);
+        return encoded.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    public static byte[] decode(byte[] input) throws Exception {
+        String decoded = java.net.URLDecoder.decode(new String(input, java.nio.charset.StandardCharsets.UTF_8),
+                java.nio.charset.StandardCharsets.UTF_8);
+        return decoded.getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     public static final class Factory implements ToolFactory<UrlEncodingEncoderDecoder> {

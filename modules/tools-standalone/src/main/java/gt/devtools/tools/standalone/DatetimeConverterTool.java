@@ -11,7 +11,6 @@ import java.awt.*;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Converts between Unix timestamps, ISO-8601, and custom date formats.
@@ -82,22 +81,45 @@ public final class DatetimeConverterTool extends TextTransformer {
 
     private Instant parseInput(String s) {
         String fmt = inputFormat.get();
-        if (fmt.contains("Unix seconds")) return Instant.ofEpochSecond(Long.parseLong(s));
-        if (fmt.contains("Unix milliseconds")) return Instant.ofEpochMilli(Long.parseLong(s));
-        // Auto-detect
-        if (s.matches("\\d{10,13}")) {
-            return s.length() > 10 ? Instant.ofEpochMilli(Long.parseLong(s))
-                    : Instant.ofEpochSecond(Long.parseLong(s));
-        }
-        return Instant.parse(s); // ISO-8601
+        if (fmt.contains("Unix seconds")) return parseTimestamp(s, "unix-seconds");
+        if (fmt.contains("Unix milliseconds")) return parseTimestamp(s, "unix-millis");
+        return parseTimestamp(s, "auto");
     }
 
     private String formatOutput(ZonedDateTime zdt) {
-        return switch (outputFormat.get()) {
-            case "RFC-1123" -> zdt.format(DateTimeFormatter.RFC_1123_DATE_TIME);
-            case "Unix milliseconds" -> String.valueOf(zdt.toInstant().toEpochMilli());
-            case "Unix seconds" -> String.valueOf(zdt.toInstant().getEpochSecond());
-            default -> zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return formatInstant(zdt.toInstant(), outputFormat.get());
+    }
+
+    // -- public static methods (testable without Swing)
+
+    /**
+     * Parses a timestamp string into an Instant.
+     * @param input the timestamp string
+     * @param mode "auto", "unix-seconds", "unix-millis", or an ISO-8601 string
+     */
+    public static java.time.Instant parseTimestamp(String input, String mode) {
+        if (mode.contains("Unix seconds") || "unix-seconds".equals(mode))
+            return java.time.Instant.ofEpochSecond(Long.parseLong(input));
+        if (mode.contains("Unix milliseconds") || "unix-millis".equals(mode))
+            return java.time.Instant.ofEpochMilli(Long.parseLong(input));
+        // Auto-detect
+        if (input.matches("\\d{10,13}")) {
+            return input.length() > 10
+                    ? java.time.Instant.ofEpochMilli(Long.parseLong(input))
+                    : java.time.Instant.ofEpochSecond(Long.parseLong(input));
+        }
+        return java.time.Instant.parse(input); // ISO-8601
+    }
+
+    /** Formats an Instant using the given output format name. */
+    public static String formatInstant(java.time.Instant instant, String outputFormat) {
+        return switch (outputFormat) {
+            case "RFC-1123" -> instant.atZone(java.time.ZoneId.of("UTC"))
+                    .format(java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME);
+            case "Unix milliseconds" -> String.valueOf(instant.toEpochMilli());
+            case "Unix seconds" -> String.valueOf(instant.getEpochSecond());
+            default -> instant.atZone(java.time.ZoneId.of("UTC"))
+                    .format(java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         };
     }
 

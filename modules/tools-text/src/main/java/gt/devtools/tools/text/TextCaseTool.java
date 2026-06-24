@@ -58,7 +58,10 @@ public final class TextCaseTool extends TextTransformer {
         };
     }
 
-    private static String toTitleCase(String s) {
+    // -- public static conversion methods (testable without Swing)
+
+    /** Converts text to Title Case: first letter of each word capitalized. */
+    public static String toTitleCase(String s) {
         var sb = new StringBuilder();
         boolean next = true;
         for (char c : s.toCharArray()) {
@@ -68,7 +71,8 @@ public final class TextCaseTool extends TextTransformer {
         return sb.toString();
     }
 
-    private static String toCamelCase(String s) {
+    /** Converts text to camelCase: first word lowercase, subsequent words capitalized. */
+    public static String toCamelCase(String s) {
         String[] words = s.split("[\\s_-]+");
         var sb = new StringBuilder();
         for (int i = 0; i < words.length; i++) {
@@ -80,7 +84,8 @@ public final class TextCaseTool extends TextTransformer {
         return sb.toString();
     }
 
-    private static String toPascalCase(String s) {
+    /** Converts text to PascalCase: each word capitalized. */
+    public static String toPascalCase(String s) {
         String[] words = s.split("[\\s_-]+");
         var sb = new StringBuilder();
         for (String w : words) {
@@ -90,15 +95,18 @@ public final class TextCaseTool extends TextTransformer {
         return sb.toString();
     }
 
-    private static String toSnakeCase(String s) {
+    /** Converts text to snake_case: lowercase, spaces/hyphens become underscores. */
+    public static String toSnakeCase(String s) {
         return s.trim().toLowerCase().replaceAll("[\\s-]+", "_");
     }
 
-    private static String toKebabCase(String s) {
+    /** Converts text to kebab-case: lowercase, spaces/underscores become hyphens. */
+    public static String toKebabCase(String s) {
         return s.trim().toLowerCase().replaceAll("[\\s_]+", "-");
     }
 
-    private static String toConstantCase(String s) {
+    /** Converts text to CONSTANT_CASE: uppercase, spaces/hyphens become underscores. */
+    public static String toConstantCase(String s) {
         return s.trim().toUpperCase().replaceAll("[\\s-]+", "_");
     }
 

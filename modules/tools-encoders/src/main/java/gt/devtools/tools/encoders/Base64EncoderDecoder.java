@@ -35,14 +35,17 @@ public final class Base64EncoderDecoder extends EncoderDecoder {
     /** Encode: plaintext → Base64. */
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        return Base64.getEncoder().encode(input);
+        return encode(input);
     }
 
     /** Decode: Base64 → plaintext. */
     @Override
     protected byte[] doConvertBackward(byte[] input) {
-        return Base64.getDecoder().decode(input);
+        return decode(input);
     }
+
+    public static byte[] encode(byte[] input) { return java.util.Base64.getEncoder().encode(input); }
+    public static byte[] decode(byte[] input) { return java.util.Base64.getDecoder().decode(input); }
 
     // ---------------------------------------------------------------
     // Factory — registered via ServiceLoader

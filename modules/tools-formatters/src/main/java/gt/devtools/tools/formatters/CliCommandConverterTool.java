@@ -8,8 +8,7 @@ import gt.devtools.tools.api.text.TextTransformer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+// ArrayList/List used via FQN in static methods
 
 /**
  * Converts between single-line and multi-line CLI command formats.
@@ -49,26 +48,36 @@ public final class CliCommandConverterTool extends TextTransformer {
     protected String doTransform(String input) {
         if (input.isBlank()) return "Paste a CLI command.";
         if (mode.get().contains("Join")) {
-            return input.replace("\\\n", " ").replaceAll("\\s+", " ").strip();
+            return joinCommand(input);
         } else {
             return splitCommand(input);
         }
     }
 
-    private String splitCommand(String cmd) {
-        List<String> parts = parseArgs(cmd);
+    // -- public static methods (testable without Swing)
+
+    /** Joins a multi-line command (with \\ continuations) into a single line. */
+    public static String joinCommand(String input) {
+        return input.replace("\\\n", " ").replaceAll("\\s+", " ").strip();
+    }
+
+    /** Splits a single-line command into multiple lines with \\ continuations. */
+    public static String splitCommand(String cmd) {
+        java.util.List<String> parts = parseArgs(cmd);
         var sb = new StringBuilder();
         for (int i = 0; i < parts.size(); i++) {
             sb.append(parts.get(i));
             if (i < parts.size() - 1) {
-                sb.append(parts.get(i).startsWith("-") || parts.get(i).equals("|") ? " \\\n    " : " \\\n  ");
+                sb.append(parts.get(i).startsWith("-") || parts.get(i).equals("|")
+                        ? " \\\n    " : " \\\n  ");
             }
         }
         return sb.toString();
     }
 
-    private static List<String> parseArgs(String cmd) {
-        var args = new ArrayList<String>();
+    /** Parses a command-line string into individual arguments, respecting quotes. */
+    public static java.util.List<String> parseArgs(String cmd) {
+        var args = new java.util.ArrayList<String>();
         var current = new StringBuilder();
         boolean inQuote = false;
         for (int i = 0; i < cmd.length(); i++) {

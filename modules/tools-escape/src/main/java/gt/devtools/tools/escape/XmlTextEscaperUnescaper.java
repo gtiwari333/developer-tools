@@ -15,14 +15,21 @@ public final class XmlTextEscaperUnescaper extends EscaperUnescaper {
 
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        return StringEscapeUtils.escapeXml10(
-                new String(input, StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+        return escape(new String(input, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) {
-        return StringEscapeUtils.unescapeXml(
-                new String(input, StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+        return unescape(new String(input, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    public static String escape(String input) {
+        return org.apache.commons.text.StringEscapeUtils.escapeXml10(input);
+    }
+    public static String unescape(String input) {
+        return org.apache.commons.text.StringEscapeUtils.unescapeXml(input);
     }
 
     public static final class Factory implements ToolFactory<XmlTextEscaperUnescaper> {

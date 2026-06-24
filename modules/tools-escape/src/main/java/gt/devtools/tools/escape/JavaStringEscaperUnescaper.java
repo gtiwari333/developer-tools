@@ -15,14 +15,21 @@ public final class JavaStringEscaperUnescaper extends EscaperUnescaper {
 
     @Override
     protected byte[] doConvertForward(byte[] input) {
-        return StringEscapeUtils.escapeJava(
-                new String(input, StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+        return escape(new String(input, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
     }
 
     @Override
     protected byte[] doConvertBackward(byte[] input) {
-        return StringEscapeUtils.unescapeJava(
-                new String(input, StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+        return unescape(new String(input, java.nio.charset.StandardCharsets.UTF_8))
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    public static String escape(String input) {
+        return org.apache.commons.text.StringEscapeUtils.escapeJava(input);
+    }
+    public static String unescape(String input) {
+        return org.apache.commons.text.StringEscapeUtils.unescapeJava(input);
     }
 
     public static final class Factory implements ToolFactory<JavaStringEscaperUnescaper> {

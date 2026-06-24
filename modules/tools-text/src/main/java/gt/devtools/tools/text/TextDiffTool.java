@@ -1,8 +1,5 @@
 package gt.devtools.tools.text;
 
-import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.AbstractDelta;
-import com.github.difflib.patch.Patch;
 import gt.devtools.settings.ToolConfiguration;
 import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolPresentation;
@@ -10,8 +7,6 @@ import gt.devtools.tools.api.text.TextTransformer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
 
 /** Computes a unified diff between two text blocks. */
 public final class TextDiffTool extends TextTransformer {
@@ -31,16 +26,26 @@ public final class TextDiffTool extends TextTransformer {
         if (input.isBlank()) return "Paste original text, then ---, then revised text.";
         String[] parts = input.split("\n---\n", 2);
         if (parts.length < 2) return "Use --- on its own line to separate original and revised text.";
+        return diff(parts[0], parts[1]);
+    }
 
-        List<String> original = Arrays.asList(parts[0].split("\n", -1));
-        List<String> revised = Arrays.asList(parts[1].split("\n", -1));
-        Patch<String> patch = DiffUtils.diff(original, revised);
+    // -- public static method (testable without Swing)
+
+    /**
+     * Computes a unified diff between two text blocks.
+     * Returns a human-readable diff or "(no differences)" if identical.
+     */
+    public static String diff(String original, String revised) {
+        var originalLines = java.util.Arrays.asList(original.split("\n", -1));
+        var revisedLines = java.util.Arrays.asList(revised.split("\n", -1));
+        com.github.difflib.patch.Patch<String> patch =
+                com.github.difflib.DiffUtils.diff(originalLines, revisedLines);
 
         if (patch.getDeltas().isEmpty()) return "(no differences)";
 
         var sb = new StringBuilder();
         sb.append("--- original\n+++ revised\n@@ diff summary @@\n");
-        for (AbstractDelta<String> delta : patch.getDeltas()) {
+        for (com.github.difflib.patch.AbstractDelta<String> delta : patch.getDeltas()) {
             for (String line : delta.getSource().getLines()) {
                 sb.append("- ").append(line).append("\n");
             }

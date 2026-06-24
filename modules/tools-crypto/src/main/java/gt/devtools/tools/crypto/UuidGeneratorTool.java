@@ -64,22 +64,47 @@ public final class UuidGeneratorTool extends OneLineTextGenerator {
     @Override
     protected String generate() throws Exception {
         String v = version.get();
-        UUID uuid;
-        if (v.startsWith("v1")) {
-            uuid = Generators.timeBasedGenerator().generate();
-        } else if (v.startsWith("v3")) {
-            uuid = UUID.nameUUIDFromBytes((namespace.get() + name.get()).getBytes());
-        } else if (v.startsWith("v5")) {
-            uuid = Generators.nameBasedGenerator(UUID.fromString(namespace.get())).generate(name.get());
-        } else if (v.startsWith("v6")) {
-            uuid = Generators.timeBasedReorderedGenerator().generate();
-        } else if (v.startsWith("v7")) {
-            TimeBasedEpochGenerator gen = Generators.timeBasedEpochGenerator();
-            uuid = gen.generate();
-        } else {
-            uuid = UUID.randomUUID();
-        }
-        return uuid.toString();
+        if (v.startsWith("v3")) return generateV3(namespace.get(), name.get());
+        if (v.startsWith("v5")) return generateV5(namespace.get(), name.get());
+        return generateByMode(v);
+    }
+
+    // -- public static methods (testable without Swing)
+
+    /** Generates a v4 (random) UUID. */
+    public static String generateV4() { return java.util.UUID.randomUUID().toString(); }
+
+    /** Generates a v3 (MD5 name-based) UUID. */
+    public static String generateV3(String namespace, String name) {
+        return java.util.UUID.nameUUIDFromBytes((namespace + name).getBytes()).toString();
+    }
+
+    /** Generates a time-based (v1) UUID. */
+    public static String generateV1() {
+        return com.fasterxml.uuid.Generators.timeBasedGenerator().generate().toString();
+    }
+
+    /** Generates a v6 (reordered time) UUID. */
+    public static String generateV6() {
+        return com.fasterxml.uuid.Generators.timeBasedReorderedGenerator().generate().toString();
+    }
+
+    /** Generates a v7 (epoch+random) UUID. */
+    public static String generateV7() {
+        return com.fasterxml.uuid.Generators.timeBasedEpochGenerator().generate().toString();
+    }
+
+    /** Generates a v5 (SHA-1 name-based) UUID. */
+    public static String generateV5(String namespace, String name) {
+        return com.fasterxml.uuid.Generators.nameBasedGenerator(
+                java.util.UUID.fromString(namespace)).generate(name).toString();
+    }
+
+    private String generateByMode(String v) throws Exception {
+        if (v.startsWith("v1")) return generateV1();
+        if (v.startsWith("v6")) return generateV6();
+        if (v.startsWith("v7")) return generateV7();
+        return generateV4();
     }
 
     public static final class Factory implements ToolFactory<UuidGeneratorTool> {
