@@ -2,23 +2,24 @@ package gt.devtools.tools.formatters;
 
 import com.github.vertical_blank.sqlformatter.SqlFormatter;
 import gt.devtools.settings.ToolConfiguration;
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolPresentation;
-import gt.devtools.tools.api.text.TextTransformer;
+import gt.devtools.tools.api.fx.TextTransformerFx;
+import gt.devtools.tools.api.fx.ToolFxFactory;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
-import javax.swing.*;
-import java.awt.*;
+/** JavaFX version: Formats SQL statements with proper indentation and casing. */
+public final class SqlFormatterToolFx extends TextTransformerFx {
 
-/** Formats SQL statements with proper indentation and casing. */
-public final class SqlFormatterTool extends TextTransformer {
-
-    private SqlFormatterTool(ToolConfiguration config) { super(config); }
+    private SqlFormatterToolFx(ToolConfiguration config) { super(config); }
 
     @Override
-    protected void buildUi(JPanel panel) {
-        var configBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        configBar.add(new JLabel("Paste SQL on the left, formatted output on the right."));
-        panel.add(configBar, BorderLayout.NORTH);
+    protected void buildUi(BorderPane panel) {
+        var configBar = new HBox(8);
+        configBar.setStyle("-fx-padding: 4 0;");
+        configBar.getChildren().add(new Label("Paste SQL on the left, formatted output on the right."));
+        panel.setTop(configBar);
         super.buildUi(panel);
         sourceEditor.setSyntaxStyle("text/sql");
         resultEditor.setSyntaxStyle("text/sql");
@@ -37,13 +38,13 @@ public final class SqlFormatterTool extends TextTransformer {
         }
     }
 
-    public static final class Factory implements ToolFactory<SqlFormatterTool> {
+    public static final class Factory implements ToolFxFactory<SqlFormatterToolFx> {
         public Factory() {}
         @Override public String getId() { return "sql-formatting"; }
         @Override public ToolPresentation getPresentation() {
             return ToolPresentation.of("sql-formatting",
                     "SQL Formatter", "SQL Formatting").withGroupId("formatters");
         }
-        @Override public SqlFormatterTool create(ToolConfiguration config) { return new SqlFormatterTool(config); }
+        @Override public SqlFormatterToolFx create(ToolConfiguration config) { return new SqlFormatterToolFx(config); }
     }
 }

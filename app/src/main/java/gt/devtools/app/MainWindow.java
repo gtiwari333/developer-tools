@@ -74,7 +74,7 @@ public final class MainWindow extends BorderPane {
         var fileMenu = new Menu("File");
         var settingsItem = new MenuItem("Settings");
         settingsItem.setAccelerator(new KeyCodeCombination(KeyCode.COMMA, KeyCombination.CONTROL_DOWN));
-        settingsItem.setOnAction(e -> System.out.println("Settings not yet implemented in JavaFX shell"));
+        settingsItem.setOnAction(e -> openSettings());
         var exitItem = new MenuItem("Exit");
         exitItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
         exitItem.setOnAction(e -> saveAndExit());
@@ -86,8 +86,8 @@ public final class MainWindow extends BorderPane {
         searchItem.setOnAction(e -> sidebar.focusSearch());
         var themeItem = new MenuItem("Toggle Theme");
         themeItem.setOnAction(e -> {
-            appSettings.setTheme("dark".equals(appSettings.getTheme()) ? "light" : "dark");
-            System.out.println("Theme: " + appSettings.getTheme() + " (restart to apply)");
+            String newTheme = "dark".equals(appSettings.getTheme()) ? "light" : "dark";
+            DevToolsAppFx.applyTheme(newTheme);
         });
         viewMenu.getItems().addAll(searchItem, new SeparatorMenuItem(), themeItem);
 
@@ -173,5 +173,20 @@ public final class MainWindow extends BorderPane {
         saveSettings();
         Platform.exit();
         System.exit(0);
+    }
+
+    private void openSettings() {
+        var dialog = new FxSettingsDialog(appSettings);
+        var result = dialog.showAndWait();
+        result.ifPresent(newSettings -> {
+            // Copy new values back to the live AppSettings
+            appSettings.setTheme(newSettings.getTheme());
+            appSettings.setCheckForUpdates(newSettings.isCheckForUpdates());
+            appSettings.setShowInternalTools(newSettings.isShowInternalTools());
+            // Apply theme immediately if changed
+            DevToolsAppFx.applyTheme(appSettings.getTheme());
+            // Save to disk
+            settingsManager.saveAppSettings(appSettings);
+        });
     }
 }

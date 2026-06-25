@@ -10,15 +10,17 @@ import java.nio.charset.StandardCharsets;
 
 public final class UrlEncodingEncoderDecoderFx extends EncoderDecoderFx {
     private UrlEncodingEncoderDecoderFx(ToolConfiguration config) { super(config); }
-    @Override protected byte[] doConvertForward(byte[] input) {
+    @Override protected byte[] doConvertForward(byte[] input) { return encode(input); }
+    @Override protected byte[] doConvertBackward(byte[] input) throws Exception { return decode(input); }
+    public static byte[] encode(byte[] input) {
         return URLEncoder.encode(new String(input, StandardCharsets.UTF_8), StandardCharsets.UTF_8).getBytes(StandardCharsets.UTF_8); }
-    @Override protected byte[] doConvertBackward(byte[] input) throws Exception {
+    public static byte[] decode(byte[] input) throws Exception {
         return URLDecoder.decode(new String(input, StandardCharsets.UTF_8), StandardCharsets.UTF_8).getBytes(StandardCharsets.UTF_8); }
     public static final class Factory implements ToolFxFactory<UrlEncodingEncoderDecoderFx> {
         public Factory() {}
-        @Override public String getId() { return "url-encoding-encoder-decoder-fx"; }
+        @Override public String getId() { return "url-encoding-encoder-decoder"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("url-encoding-encoder-decoder-fx", "URL Encoding (FX)", "URL Encoding Encoder / Decoder").withGroupId("encoders"); }
+            return ToolPresentation.of("url-encoding-encoder-decoder", "URL Encoding", "URL Encoding Encoder / Decoder").withGroupId("encoders"); }
         @Override public UrlEncodingEncoderDecoderFx create(ToolConfiguration c) { return new UrlEncodingEncoderDecoderFx(c); }
     }
 }

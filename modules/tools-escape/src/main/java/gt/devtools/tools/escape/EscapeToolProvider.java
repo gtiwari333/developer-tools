@@ -1,7 +1,7 @@
 package gt.devtools.tools.escape;
 
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolProvider;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 
 import java.util.List;
 
@@ -12,14 +12,14 @@ public final class EscapeToolProvider implements ToolProvider {
     @Override public String getName() { return "Text Escape"; }
 
     @Override
-    public List<ToolFactory<?>> getTools() {
+    public List<ToolFxFactory<?>> getTools() {
         return List.of(
-                new HtmlEntitiesEscaperUnescaper.Factory(),
-                new JavaStringEscaperUnescaper.Factory(),
-                new JsonTextEscaperUnescaper.Factory(),
-                new CsvTextEscaperUnescaper.Factory(),
-                new XmlTextEscaperUnescaper.Factory(),
-                new EscapeSequencesEscaperUnescaper.Factory()
+                new HtmlEntitiesEscaperUnescaperFx.Factory(),
+                new JavaStringEscaperUnescaperFx.Factory(),
+                new JsonTextEscaperUnescaperFx.Factory(),
+                new CsvTextEscaperUnescaperFx.Factory(),
+                new XmlTextEscaperUnescaperFx.Factory(),
+                new EscapeSequencesEscaperUnescaperFx.Factory()
         );
     }
 }

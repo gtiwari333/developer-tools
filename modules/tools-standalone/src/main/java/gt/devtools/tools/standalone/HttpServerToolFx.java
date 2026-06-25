@@ -77,9 +77,9 @@ public final class HttpServerToolFx extends DeveloperToolFx {
     @Override public void dispose() { super.dispose(); if (server != null) server.stop(0); }
 
     public static final class Factory implements ToolFxFactory<HttpServerToolFx> {
-        public Factory() {} @Override public String getId() { return "http-server-fx"; }
+        public Factory() {} @Override public String getId() { return "http-server"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("http-server-fx", "HTTP Server (FX)", "HTTP Server").withGroupId("network"); }
+            return ToolPresentation.of("http-server", "HTTP Server", "HTTP Server").withGroupId("network"); }
         @Override public HttpServerToolFx create(ToolConfiguration c) { return new HttpServerToolFx(c); }
     }
 }

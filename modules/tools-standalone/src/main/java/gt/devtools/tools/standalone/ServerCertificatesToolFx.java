@@ -65,9 +65,9 @@ public final class ServerCertificatesToolFx extends DeveloperToolFx {
     }
 
     public static final class Factory implements ToolFxFactory<ServerCertificatesToolFx> {
-        public Factory() {} @Override public String getId() { return "certificates-download-fx"; }
+        public Factory() {} @Override public String getId() { return "certificates-download"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("certificates-download-fx", "Server Certs (FX)", "Server Certificates").withGroupId("network"); }
+            return ToolPresentation.of("certificates-download", "Server Certs", "Server Certificates").withGroupId("network"); }
         @Override public ServerCertificatesToolFx create(ToolConfiguration c) { return new ServerCertificatesToolFx(c); }
     }
 }

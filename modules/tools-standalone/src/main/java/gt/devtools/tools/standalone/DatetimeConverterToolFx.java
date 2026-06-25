@@ -5,7 +5,8 @@ import gt.devtools.settings.ToolConfiguration;
 import gt.devtools.tools.api.ToolPresentation;
 import gt.devtools.tools.api.fx.TextTransformerFx;
 import gt.devtools.tools.api.fx.ToolFxFactory;
-import java.time.Instant;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
@@ -32,13 +33,51 @@ public final class DatetimeConverterToolFx extends TextTransformerFx {
     @Override protected String getTransformLabel() { return "Convert"; }
     @Override protected String doTransform(String input) throws Exception {
         if (input.isBlank()) return "Enter a timestamp or ISO-8601 date.";
-        Instant instant = DatetimeConverterTool.parseTimestamp(input.strip(), inputFormat.get());
-        return DatetimeConverterTool.formatInstant(instant, outputFormat.get());
+        Instant instant = parseTimestamp(input.strip(), normalizeInputFormat(inputFormat.get()));
+        return formatInstant(instant, normalizeOutputFormat(outputFormat.get()));
     }
+    private static String normalizeInputFormat(String uiFormat) {
+        return switch (uiFormat) {
+            case "Unix seconds" -> "unix-seconds";
+            case "Unix milliseconds" -> "unix-millis";
+            default -> "auto";
+        };
+    }
+    private static String normalizeOutputFormat(String uiFormat) {
+        return switch (uiFormat) {
+            case "Unix seconds" -> "unix-seconds";
+            case "Unix milliseconds" -> "unix-millis";
+            default -> uiFormat;
+        };
+    }
+
+    public static Instant parseTimestamp(String text, String inputFormat) {
+        return switch (inputFormat) {
+            case "unix-seconds" -> Instant.ofEpochSecond(Long.parseLong(text));
+            case "unix-millis" -> Instant.ofEpochMilli(Long.parseLong(text));
+            default -> {
+                try {
+                    long num = Long.parseLong(text);
+                    // 10-digit numbers are Unix seconds, 13-digit are milliseconds
+                    yield text.length() <= 10 ? Instant.ofEpochSecond(num) : Instant.ofEpochMilli(num);
+                } catch (NumberFormatException e) { yield Instant.parse(text); }
+            }
+        };
+    }
+
+    public static String formatInstant(Instant instant, String format) {
+        return switch (format) {
+            case "RFC-1123" -> DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneOffset.UTC).format(instant);
+            case "unix-millis", "Unix milliseconds" -> String.valueOf(instant.toEpochMilli());
+            case "unix-seconds", "Unix seconds" -> String.valueOf(instant.getEpochSecond());
+            default -> instant.toString();
+        };
+    }
+
     public static final class Factory implements ToolFxFactory<DatetimeConverterToolFx> {
-        public Factory() {} @Override public String getId() { return "date-time-converter-fx"; }
+        public Factory() {} @Override public String getId() { return "date-time-converter"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("date-time-converter-fx", "Date/Time (FX)", "Date / Time Converter").withGroupId("formatters"); }
+            return ToolPresentation.of("date-time-converter", "Date/Time", "Date / Time Converter").withGroupId("formatters"); }
         @Override public DatetimeConverterToolFx create(ToolConfiguration c) { return new DatetimeConverterToolFx(c); }
     }
 }

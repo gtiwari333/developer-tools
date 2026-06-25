@@ -1,22 +1,19 @@
 package gt.devtools.tools.text;
 
 import gt.devtools.settings.ToolConfiguration;
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolPresentation;
-import gt.devtools.tools.api.text.TextTransformer;
+import gt.devtools.tools.api.fx.TextTransformerFx;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import java.util.Arrays;
 
-/** Computes a unified diff between two text blocks. */
-public final class TextDiffTool extends TextTransformer {
+/**
+ * JavaFX version: Computes a unified diff between two text blocks.
+ * Input: original text, then "---" on its own line, then revised text.
+ */
+public final class TextDiffToolFx extends TextTransformerFx {
 
-    private TextDiffTool(ToolConfiguration config) { super(config); }
-
-    @Override
-    protected void buildUi(JPanel panel) {
-        super.buildUi(panel);
-    }
+    private TextDiffToolFx(ToolConfiguration config) { super(config); }
 
     @Override
     protected String getTransformLabel() { return "Diff"; }
@@ -29,15 +26,10 @@ public final class TextDiffTool extends TextTransformer {
         return diff(parts[0], parts[1]);
     }
 
-    // -- public static method (testable without Swing)
-
-    /**
-     * Computes a unified diff between two text blocks.
-     * Returns a human-readable diff or "(no differences)" if identical.
-     */
+    /** Computes a unified diff between two text blocks. */
     public static String diff(String original, String revised) {
-        var originalLines = java.util.Arrays.asList(original.split("\n", -1));
-        var revisedLines = java.util.Arrays.asList(revised.split("\n", -1));
+        var originalLines = Arrays.asList(original.split("\n", -1));
+        var revisedLines = Arrays.asList(revised.split("\n", -1));
         com.github.difflib.patch.Patch<String> patch =
                 com.github.difflib.DiffUtils.diff(originalLines, revisedLines);
 
@@ -56,12 +48,12 @@ public final class TextDiffTool extends TextTransformer {
         return sb.toString();
     }
 
-    public static final class Factory implements ToolFactory<TextDiffTool> {
+    public static final class Factory implements ToolFxFactory<TextDiffToolFx> {
         public Factory() {}
         @Override public String getId() { return "text-diff"; }
         @Override public ToolPresentation getPresentation() {
             return ToolPresentation.of("text-diff", "Text Diff", "Text Diff Viewer").withGroupId("text");
         }
-        @Override public TextDiffTool create(ToolConfiguration config) { return new TextDiffTool(config); }
+        @Override public TextDiffToolFx create(ToolConfiguration config) { return new TextDiffToolFx(config); }
     }
 }

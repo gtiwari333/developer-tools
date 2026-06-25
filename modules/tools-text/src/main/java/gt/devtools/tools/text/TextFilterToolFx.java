@@ -8,6 +8,11 @@ import gt.devtools.tools.api.fx.ToolFxFactory;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 public final class TextFilterToolFx extends TextTransformerFx {
     private final ValueProperty<String> mode, pattern;
     private TextFilterToolFx(ToolConfiguration config) {
@@ -23,15 +28,42 @@ public final class TextFilterToolFx extends TextTransformerFx {
     @Override protected String getTransformLabel() { return "Filter"; }
     @Override protected String doTransform(String input) {
         return switch (mode.get()) {
-            case "Include matching" -> TextFilterTool.filterInclude(input, pattern.get());
-            case "Exclude matching" -> TextFilterTool.filterExclude(input, pattern.get());
-            case "Unique lines" -> TextFilterTool.filterUnique(input);
-            case "Trim whitespace" -> TextFilterTool.trimLines(input);
+            case "Include matching" -> filterInclude(input, pattern.get());
+            case "Exclude matching" -> filterExclude(input, pattern.get());
+            case "Unique lines" -> filterUnique(input);
+            case "Trim whitespace" -> trimLines(input);
             default -> input; }; }
+
+    /** Keep only lines matching the regex. */
+    public static String filterInclude(String input, String pattern) {
+        if (pattern.isEmpty()) return input;
+        var p = Pattern.compile(pattern);
+        return Arrays.stream(input.split("\n")).filter(l -> p.matcher(l).find()).collect(Collectors.joining("\n"));
+    }
+    /** Remove lines matching the regex. */
+    public static String filterExclude(String input, String pattern) {
+        if (pattern.isEmpty()) return input;
+        var p = Pattern.compile(pattern);
+        return Arrays.stream(input.split("\n")).filter(l -> !p.matcher(l).find()).collect(Collectors.joining("\n"));
+    }
+    /** Deduplicate lines, preserving first occurrence order. */
+    public static String filterUnique(String input) {
+        var seen = new LinkedHashSet<String>();
+        for (String line : input.split("\n")) seen.add(line);
+        return String.join("\n", seen);
+    }
+    /** Trim leading/trailing whitespace from each line. */
+    public static String trimLines(String input) {
+        var result = Arrays.stream(input.split("\n", -1)).map(String::trim)
+                .collect(Collectors.joining("\n"));
+        // If all lines were whitespace-only, return empty
+        return result.isBlank() ? "" : result;
+    }
+
     public static final class Factory implements ToolFxFactory<TextFilterToolFx> {
-        public Factory() {} @Override public String getId() { return "text-filter-fx"; }
+        public Factory() {} @Override public String getId() { return "text-filter"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("text-filter-fx", "Text Filter (FX)", "Text Filter").withGroupId("text"); }
+            return ToolPresentation.of("text-filter", "Text Filter", "Text Filter").withGroupId("text"); }
         @Override public TextFilterToolFx create(ToolConfiguration c) { return new TextFilterToolFx(c); }
     }
 }

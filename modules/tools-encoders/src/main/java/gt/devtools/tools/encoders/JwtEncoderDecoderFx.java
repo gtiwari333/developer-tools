@@ -2,27 +2,30 @@ package gt.devtools.tools.encoders;
 
 import gt.devtools.common.ValueProperty;
 import gt.devtools.settings.ToolConfiguration;
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolPresentation;
-import gt.devtools.tools.api.converter.EncoderDecoder;
+import gt.devtools.tools.api.fx.EncoderDecoderFx;
+import gt.devtools.tools.api.fx.ToolFxFactory;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.keys.HmacKey;
 
-import javax.swing.*;
-import java.awt.*;
 import java.nio.charset.StandardCharsets;
 
 /**
- * JWT (JSON Web Token) encode / decode tool.
+ * JavaFX version of JWT (JSON Web Token) encode / decode tool.
  * <p>
  * Supports HMAC-based algorithms (HS256, HS384, HS512). The user provides
  * the secret key in the configuration panel. Encoding: header+payload → JWT.
  * Decoding: JWT → header+payload JSON (with signature verification).
  */
-public final class JwtEncoderDecoder extends EncoderDecoder {
+public final class JwtEncoderDecoderFx extends EncoderDecoderFx {
 
     private static final String[] ALGORITHMS = {
             AlgorithmIdentifiers.HMAC_SHA256,
@@ -33,36 +36,32 @@ public final class JwtEncoderDecoder extends EncoderDecoder {
     private final ValueProperty<String> secret;
     private final ValueProperty<String> algorithm;
 
-    private JwtEncoderDecoder(ToolConfiguration config) {
+    private JwtEncoderDecoderFx(ToolConfiguration config) {
         super(config);
         this.algorithm = registerConfig("jwtAlgorithm", ALGORITHMS[0]);
         this.secret = registerSensitive("jwtSecret", "");
     }
 
-    // ---------------------------------------------------------------
-    // UI — add config panel above the converter
-    // ---------------------------------------------------------------
-
     @Override
-    protected void buildUi(JPanel panel) {
+    protected void buildUi(BorderPane panel) {
         // Config row at top
-        var configBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        configBar.add(new JLabel("Algorithm:"));
-        var algoCombo = new JComboBox<>(ALGORITHMS);
-        algoCombo.setSelectedItem(algorithm.get());
-        algoCombo.addActionListener(e -> algorithm.set((String) algoCombo.getSelectedItem()));
-        configBar.add(algoCombo);
-        configBar.add(new JLabel("Secret:"));
-        var secretField = new JTextField(secret.get(), 25);
-        secretField.addActionListener(e -> secret.set(secretField.getText()));
-        secretField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
-                secret.set(secretField.getText());
-            }
-        });
-        configBar.add(secretField);
-        panel.add(configBar, BorderLayout.NORTH);
+        var configBar = new HBox(8);
+        configBar.setStyle("-fx-padding: 4 0;");
+        configBar.getChildren().add(new Label("Algorithm:"));
+
+        var algoCombo = new ComboBox<String>();
+        algoCombo.getItems().addAll(ALGORITHMS);
+        algoCombo.setValue(algorithm.get());
+        algoCombo.setOnAction(e -> algorithm.set(algoCombo.getValue()));
+        configBar.getChildren().add(algoCombo);
+
+        configBar.getChildren().add(new Label("Secret:"));
+        var secretField = new TextField(secret.get());
+        secretField.setPrefColumnCount(25);
+        secretField.textProperty().addListener((obs, old, val) -> secret.set(val));
+        configBar.getChildren().add(secretField);
+
+        panel.setTop(configBar);
 
         // Standard converter layout below
         super.buildUi(panel);
@@ -74,10 +73,6 @@ public final class JwtEncoderDecoder extends EncoderDecoder {
         sourceEditor.setSyntaxStyle("json");
         targetEditor.setSyntaxStyle("text/plain");
     }
-
-    // ---------------------------------------------------------------
-    // Conversion logic
-    // ---------------------------------------------------------------
 
     @Override
     protected byte[] doConvertForward(byte[] input) throws Exception {
@@ -118,11 +113,7 @@ public final class JwtEncoderDecoder extends EncoderDecoder {
         algorithm.reset();
     }
 
-    // ---------------------------------------------------------------
-    // Factory
-    // ---------------------------------------------------------------
-
-    public static final class Factory implements ToolFactory<JwtEncoderDecoder> {
+    public static final class Factory implements ToolFxFactory<JwtEncoderDecoderFx> {
         public Factory() {}
         @Override public String getId() { return "jwt-encoder-decoder"; }
         @Override
@@ -136,8 +127,8 @@ public final class JwtEncoderDecoder extends EncoderDecoder {
                             "paste a JWT token on the right to verify and decode.");
         }
         @Override
-        public JwtEncoderDecoder create(ToolConfiguration config) {
-            return new JwtEncoderDecoder(config);
+        public JwtEncoderDecoderFx create(ToolConfiguration config) {
+            return new JwtEncoderDecoderFx(config);
         }
     }
 }

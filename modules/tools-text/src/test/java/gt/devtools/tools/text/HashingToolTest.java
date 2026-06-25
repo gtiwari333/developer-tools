@@ -7,13 +7,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("HashingTool.hash")
+@DisplayName("HashingToolFx.hash")
 class HashingToolTest {
 
     @Test
     @DisplayName("SHA-256 produces 64-character hex string")
     void sha256OutputLength() throws Exception {
-        String result = HashingTool.hash("hello", "SHA-256");
+        String result = HashingToolFx.hash("hello", "SHA-256");
         assertThat(result).hasSize(64);
         assertThat(result).matches("[0-9a-f]{64}");
     }
@@ -21,45 +21,45 @@ class HashingToolTest {
     @Test
     @DisplayName("SHA-512 produces 128-character hex string")
     void sha512OutputLength() throws Exception {
-        String result = HashingTool.hash("hello", "SHA-512");
+        String result = HashingToolFx.hash("hello", "SHA-512");
         assertThat(result).hasSize(128);
     }
 
     @Test
     @DisplayName("MD5 produces 32-character hex string")
     void md5OutputLength() throws Exception {
-        String result = HashingTool.hash("hello", "MD5");
+        String result = HashingToolFx.hash("hello", "MD5");
         assertThat(result).hasSize(32);
     }
 
     @Test
     @DisplayName("SHA-1 produces 40-character hex string")
     void sha1OutputLength() throws Exception {
-        String result = HashingTool.hash("hello", "SHA-1");
+        String result = HashingToolFx.hash("hello", "SHA-1");
         assertThat(result).hasSize(40);
     }
 
     @Test
     @DisplayName("same input produces same hash")
     void deterministic() throws Exception {
-        String hash1 = HashingTool.hash("hello", "SHA-256");
-        String hash2 = HashingTool.hash("hello", "SHA-256");
+        String hash1 = HashingToolFx.hash("hello", "SHA-256");
+        String hash2 = HashingToolFx.hash("hello", "SHA-256");
         assertThat(hash1).isEqualTo(hash2);
     }
 
     @Test
     @DisplayName("different inputs produce different hashes")
     void differentInputsDifferentHashes() throws Exception {
-        String hash1 = HashingTool.hash("hello", "SHA-256");
-        String hash2 = HashingTool.hash("world", "SHA-256");
+        String hash1 = HashingToolFx.hash("hello", "SHA-256");
+        String hash2 = HashingToolFx.hash("world", "SHA-256");
         assertThat(hash1).isNotEqualTo(hash2);
     }
 
     @Test
     @DisplayName("different algorithms produce different hashes")
     void differentAlgorithmsDifferentHashes() throws Exception {
-        String sha256 = HashingTool.hash("hello", "SHA-256");
-        String sha512 = HashingTool.hash("hello", "SHA-512");
+        String sha256 = HashingToolFx.hash("hello", "SHA-256");
+        String sha512 = HashingToolFx.hash("hello", "SHA-512");
         assertThat(sha256).isNotEqualTo(sha512);
     }
 
@@ -71,21 +71,21 @@ class HashingToolTest {
     })
     @DisplayName("known test vectors for common algorithms")
     void knownTestVectors(String input, String algorithm, String expected) throws Exception {
-        assertThat(HashingTool.hash(input, algorithm)).isEqualTo(expected);
+        assertThat(HashingToolFx.hash(input, algorithm)).isEqualTo(expected);
     }
 
     @Test
     @DisplayName("empty input")
     void emptyInput() throws Exception {
-        String result = HashingTool.hash("", "SHA-256");
+        String result = HashingToolFx.hash("", "SHA-256");
         assertThat(result).hasSize(64);
     }
 
     @Test
     @DisplayName("unicode input works")
     void unicodeInput() throws Exception {
-        String result = HashingTool.hash("héllo", "SHA-256");
+        String result = HashingToolFx.hash("héllo", "SHA-256");
         assertThat(result).hasSize(64);
-        assertThat(result).isNotEqualTo(HashingTool.hash("hello", "SHA-256"));
+        assertThat(result).isNotEqualTo(HashingToolFx.hash("hello", "SHA-256"));
     }
 }

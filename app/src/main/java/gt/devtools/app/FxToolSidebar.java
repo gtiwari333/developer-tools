@@ -1,7 +1,7 @@
 package gt.devtools.app;
 
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolRegistry;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
@@ -140,7 +140,7 @@ public final class FxToolSidebar extends VBox {
     // Context menu
     // ---------------------------------------------------------------
 
-    private void showContextMenu(ToolFactory<?> factory, double x, double y) {
+    private void showContextMenu(ToolFxFactory<?> factory, double x, double y) {
         var menu = new ContextMenu();
         var openItem = new MenuItem("Open this tool");
         openItem.setOnAction(e -> contentPanel.openTool(factory));

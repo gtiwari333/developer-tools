@@ -1,8 +1,8 @@
 package gt.devtools.app;
 
 import gt.devtools.settings.SettingsManager;
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolRegistry;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -55,7 +55,7 @@ public final class FxContentPanel extends BorderPane {
     // ---------------------------------------------------------------
 
     /** Open or focus a tool (single-click behaviour). */
-    public void openTool(ToolFactory<?> factory) {
+    public void openTool(ToolFxFactory<?> factory) {
         String toolId = factory.getId();
         ToolEntry existing = openTools.get(toolId);
         if (existing != null) {
@@ -66,7 +66,7 @@ public final class FxContentPanel extends BorderPane {
     }
 
     /** Always opens a new tab (or nested workbench). */
-    public void openToolInNewTab(ToolFactory<?> factory) {
+    public void openToolInNewTab(ToolFxFactory<?> factory) {
         String toolId = factory.getId();
         ToolEntry existing = openTools.get(toolId);
 
@@ -95,8 +95,14 @@ public final class FxContentPanel extends BorderPane {
             }
         });
 
-        // Custom tab header
+        // When the last workbench child tab is closed, close the parent tab too.
+        // Safe to call synchronously — we're removing from the parent TabPane,
+        // not the child TabPane whose listener triggered this callback.
+        workbench.setOnEmpty(() -> closeTool(toolId));
+
+        // Custom tab header (suppress default text since graphic includes it)
         tab.setGraphic(buildTabHeader(factory, tab, toolId, title));
+        tab.setText(null);
 
         // Right-click context menu on tab header
         tab.getGraphic().setOnContextMenuRequested(e ->
@@ -159,7 +165,7 @@ public final class FxContentPanel extends BorderPane {
     // Tab header
     // ---------------------------------------------------------------
 
-    private HBox buildTabHeader(ToolFactory<?> factory, Tab tab,
+    private HBox buildTabHeader(ToolFxFactory<?> factory, Tab tab,
                                  String toolId, String title) {
         var header = new HBox(4);
         header.setAlignment(Pos.CENTER_LEFT);
@@ -178,13 +184,6 @@ public final class FxContentPanel extends BorderPane {
         var titleLabel = new Label(title);
         titleLabel.setPadding(new Insets(0, 2, 0, 4));
         header.getChildren().add(titleLabel);
-
-        // Close button
-        var closeBtn = new Button("×");
-        closeBtn.setStyle("-fx-background-color: transparent; -fx-font-size: 14px; "
-                + "-fx-font-weight: bold; -fx-padding: 0 4;");
-        closeBtn.setOnAction(e -> closeTool(toolId));
-        header.getChildren().add(closeBtn);
 
         return header;
     }
@@ -280,6 +279,6 @@ public final class FxContentPanel extends BorderPane {
     // Data types
     // ---------------------------------------------------------------
 
-    private record ToolEntry(ToolFactory<?> factory, Tab tab,
+    private record ToolEntry(ToolFxFactory<?> factory, Tab tab,
                              FxWorkbenchTabs workbench) {}
 }

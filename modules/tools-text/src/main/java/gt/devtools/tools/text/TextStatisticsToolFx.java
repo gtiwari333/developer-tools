@@ -1,25 +1,27 @@
 package gt.devtools.tools.text;
 
 import gt.devtools.settings.ToolConfiguration;
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolPresentation;
-import gt.devtools.tools.api.text.TextTransformer;
+import gt.devtools.tools.api.fx.TextTransformerFx;
+import gt.devtools.tools.api.fx.ToolFxFactory;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
-import javax.swing.*;
-import java.awt.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 /**
- * Displays text statistics: character/word/line/byte counts, unique words,
- * frequency analysis. Shows results in the output panel as formatted text.
+ * JavaFX version: Displays text statistics: character/word/line/byte counts,
+ * unique words, frequency analysis.
  */
-public final class TextStatisticsTool extends TextTransformer {
+public final class TextStatisticsToolFx extends TextTransformerFx {
 
-    private TextStatisticsTool(ToolConfiguration config) {
+    private TextStatisticsToolFx(ToolConfiguration config) {
         super(config);
     }
-
-    // -- public value type (testable without Swing)
 
     /** Immutable snapshot of text statistics. */
     public record TextStats(int charCount, int charCountNoSpaces, int wordCount,
@@ -50,17 +52,18 @@ public final class TextStatisticsTool extends TextTransformer {
         String[] words = input.trim().split("\\s+");
         int wordCount = input.trim().isEmpty() ? 0 : words.length;
         int byteCount = input.getBytes(StandardCharsets.UTF_8).length;
-        int uniqueWords = java.util.Arrays.stream(words).collect(
-                java.util.stream.Collectors.toCollection(java.util.LinkedHashSet::new)).size();
+        int uniqueWords = Arrays.stream(words)
+                .collect(Collectors.toCollection(LinkedHashSet::new)).size();
 
         return new TextStats(chars, charsNoSpaces, wordCount, uniqueWords, lineCount, byteCount);
     }
 
     @Override
-    protected void buildUi(JPanel panel) {
-        var configBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        configBar.add(new JLabel("Live statistics as you type."));
-        panel.add(configBar, BorderLayout.NORTH);
+    protected void buildUi(BorderPane panel) {
+        var configBar = new HBox(8);
+        configBar.setStyle("-fx-padding: 4 0;");
+        configBar.getChildren().add(new Label("Live statistics as you type."));
+        panel.setTop(configBar);
         super.buildUi(panel);
     }
 
@@ -70,16 +73,17 @@ public final class TextStatisticsTool extends TextTransformer {
     @Override
     protected String doTransform(String input) {
         if (input.isEmpty()) return "Enter text on the left to see statistics.";
-        return computeStats(input).format();
+        var stats = computeStats(input);
+        return stats != null ? stats.format() : "Enter text on the left to see statistics.";
     }
 
-    public static final class Factory implements ToolFactory<TextStatisticsTool> {
+    public static final class Factory implements ToolFxFactory<TextStatisticsToolFx> {
         public Factory() {}
         @Override public String getId() { return "text-statistic"; }
         @Override public ToolPresentation getPresentation() {
             return ToolPresentation.of("text-statistic",
                     "Text Statistics", "Text Statistics").withGroupId("text");
         }
-        @Override public TextStatisticsTool create(ToolConfiguration config) { return new TextStatisticsTool(config); }
+        @Override public TextStatisticsToolFx create(ToolConfiguration config) { return new TextStatisticsToolFx(config); }
     }
 }

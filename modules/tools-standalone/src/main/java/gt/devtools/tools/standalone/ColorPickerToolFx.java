@@ -86,9 +86,9 @@ public final class ColorPickerToolFx extends DeveloperToolFx {
     }
 
     public static final class Factory implements ToolFxFactory<ColorPickerToolFx> {
-        public Factory() {} @Override public String getId() { return "color-picker-fx"; }
+        public Factory() {} @Override public String getId() { return "color-picker"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("color-picker-fx", "Color Picker (FX)", "Color Picker").withGroupId("creativity"); }
+            return ToolPresentation.of("color-picker", "Color Picker", "Color Picker").withGroupId("creativity"); }
         @Override public ColorPickerToolFx create(ToolConfiguration c) { return new ColorPickerToolFx(c); }
     }
 }

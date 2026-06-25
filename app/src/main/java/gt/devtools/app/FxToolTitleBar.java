@@ -1,6 +1,6 @@
 package gt.devtools.app;
 
-import gt.devtools.tools.api.ToolFactory;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -18,10 +18,10 @@ import javafx.scene.layout.HBox;
  */
 public final class FxToolTitleBar extends BorderPane {
 
-    private final ToolFactory<?> factory;
+    private final ToolFxFactory<?> factory;
     private final FxWorkbenchTabs workbench;
 
-    public FxToolTitleBar(ToolFactory<?> factory, FxWorkbenchTabs workbench) {
+    public FxToolTitleBar(ToolFxFactory<?> factory, FxWorkbenchTabs workbench) {
         this.factory = factory;
         this.workbench = workbench;
 

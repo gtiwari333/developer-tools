@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("TextFilterTool static methods")
+@DisplayName("TextFilterToolFx static methods")
 class TextFilterToolTest {
 
     // -- filterInclude
@@ -14,7 +14,7 @@ class TextFilterToolTest {
     @DisplayName("filterInclude: keeps only matching lines")
     void includeMatchingLines() {
         String input = "apple\nbanana\napricot\ncherry";
-        String result = TextFilterTool.filterInclude(input, "^a");
+        String result = TextFilterToolFx.filterInclude(input, "^a");
 
         assertThat(result).isEqualTo("apple\napricot");
     }
@@ -22,7 +22,7 @@ class TextFilterToolTest {
     @Test
     @DisplayName("filterInclude: empty result when no matches")
     void includeNoMatches() {
-        String result = TextFilterTool.filterInclude("a\nb\nc", "z");
+        String result = TextFilterToolFx.filterInclude("a\nb\nc", "z");
 
         assertThat(result).isEmpty();
     }
@@ -30,7 +30,7 @@ class TextFilterToolTest {
     @Test
     @DisplayName("filterInclude: all lines match")
     void includeAllMatch() {
-        String result = TextFilterTool.filterInclude("cat\ndog\nbat", "[a-z]+");
+        String result = TextFilterToolFx.filterInclude("cat\ndog\nbat", "[a-z]+");
 
         assertThat(result).isEqualTo("cat\ndog\nbat");
     }
@@ -41,7 +41,7 @@ class TextFilterToolTest {
     @DisplayName("filterExclude: removes matching lines")
     void excludeMatchingLines() {
         String input = "apple\nbanana\napricot\ncherry";
-        String result = TextFilterTool.filterExclude(input, "^a");
+        String result = TextFilterToolFx.filterExclude(input, "^a");
 
         assertThat(result).isEqualTo("banana\ncherry");
     }
@@ -49,7 +49,7 @@ class TextFilterToolTest {
     @Test
     @DisplayName("filterExclude: keeps all when no matches")
     void excludeNoMatches() {
-        String result = TextFilterTool.filterExclude("a\nb\nc", "z");
+        String result = TextFilterToolFx.filterExclude("a\nb\nc", "z");
 
         assertThat(result).isEqualTo("a\nb\nc");
     }
@@ -57,7 +57,7 @@ class TextFilterToolTest {
     @Test
     @DisplayName("filterExclude: removes everything when all match")
     void excludeAllMatch() {
-        String result = TextFilterTool.filterExclude("cat\ndog\nbat", "[a-z]+");
+        String result = TextFilterToolFx.filterExclude("cat\ndog\nbat", "[a-z]+");
 
         assertThat(result).isEmpty();
     }
@@ -68,7 +68,7 @@ class TextFilterToolTest {
     @DisplayName("filterUnique: removes duplicate lines")
     void uniqueRemovesDuplicates() {
         String input = "a\nb\na\nc\nb";
-        String result = TextFilterTool.filterUnique(input);
+        String result = TextFilterToolFx.filterUnique(input);
 
         assertThat(result).isEqualTo("a\nb\nc");
     }
@@ -77,7 +77,7 @@ class TextFilterToolTest {
     @DisplayName("filterUnique: preserves order of first occurrence")
     void uniquePreservesOrder() {
         String input = "z\na\nz\nb\na";
-        String result = TextFilterTool.filterUnique(input);
+        String result = TextFilterToolFx.filterUnique(input);
 
         assertThat(result).isEqualTo("z\na\nb");
     }
@@ -85,7 +85,7 @@ class TextFilterToolTest {
     @Test
     @DisplayName("filterUnique: no change when already unique")
     void uniqueNoDuplicates() {
-        String result = TextFilterTool.filterUnique("a\nb\nc");
+        String result = TextFilterToolFx.filterUnique("a\nb\nc");
 
         assertThat(result).isEqualTo("a\nb\nc");
     }
@@ -93,7 +93,7 @@ class TextFilterToolTest {
     @Test
     @DisplayName("filterUnique: single line")
     void uniqueSingleLine() {
-        assertThat(TextFilterTool.filterUnique("hello")).isEqualTo("hello");
+        assertThat(TextFilterToolFx.filterUnique("hello")).isEqualTo("hello");
     }
 
     // -- trimLines
@@ -102,7 +102,7 @@ class TextFilterToolTest {
     @DisplayName("trimLines: strips whitespace from each line")
     void trimBasic() {
         String input = "  hello  \n  world  \n  foo  ";
-        String result = TextFilterTool.trimLines(input);
+        String result = TextFilterToolFx.trimLines(input);
 
         assertThat(result).isEqualTo("hello\nworld\nfoo");
     }
@@ -110,7 +110,7 @@ class TextFilterToolTest {
     @Test
     @DisplayName("trimLines: removes trailing newline")
     void trimNoTrailingNewline() {
-        String result = TextFilterTool.trimLines("a\nb\nc");
+        String result = TextFilterToolFx.trimLines("a\nb\nc");
 
         assertThat(result).isEqualTo("a\nb\nc");
     }
@@ -118,7 +118,7 @@ class TextFilterToolTest {
     @Test
     @DisplayName("trimLines: empty lines become empty")
     void trimEmptyLines() {
-        String result = TextFilterTool.trimLines("   \n   ");
+        String result = TextFilterToolFx.trimLines("   \n   ");
 
         assertThat(result).isEmpty();
     }
@@ -129,7 +129,7 @@ class TextFilterToolTest {
     @DisplayName("regex with special characters")
     void regexSpecialChars() {
         String input = "(test)\n[real]\n{json}";
-        String result = TextFilterTool.filterInclude(input, "\\(");
+        String result = TextFilterToolFx.filterInclude(input, "\\(");
 
         assertThat(result).isEqualTo("(test)");
     }

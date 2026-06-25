@@ -10,6 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 /** JavaFX version of Hashing tool. */
 public final class HashingToolFx extends TextTransformerFx {
 
@@ -41,15 +44,24 @@ public final class HashingToolFx extends TextTransformerFx {
 
     @Override
     protected String doTransform(String input) throws Exception {
-        return HashingTool.hash(input, algorithm.get());
+        return hash(input, algorithm.get());
+    }
+
+    /** Computes a cryptographic hash of the input and returns it as a hex string. */
+    public static String hash(String input, String algorithm) throws Exception {
+        var md = MessageDigest.getInstance(algorithm);
+        byte[] digest = md.digest(input.getBytes(StandardCharsets.UTF_8));
+        var sb = new StringBuilder();
+        for (byte b : digest) sb.append(String.format("%02x", b & 0xff));
+        return sb.toString();
     }
 
     public static final class Factory implements ToolFxFactory<HashingToolFx> {
         public Factory() {}
-        @Override public String getId() { return "hashing-transformer-fx"; }
+        @Override public String getId() { return "hashing-transformer"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("hashing-transformer-fx",
-                    "Hashing (FX)", "Hashing Transformer")
+            return ToolPresentation.of("hashing-transformer",
+                    "Hashing", "Hashing Transformer")
                     .withGroupId("text");
         }
         @Override public HashingToolFx create(ToolConfiguration config) {

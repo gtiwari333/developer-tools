@@ -2,37 +2,43 @@ package gt.devtools.tools.text;
 
 import gt.devtools.common.ValueProperty;
 import gt.devtools.settings.ToolConfiguration;
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolPresentation;
-import gt.devtools.tools.api.text.TextTransformer;
+import gt.devtools.tools.api.fx.TextTransformerFx;
+import gt.devtools.tools.api.fx.ToolFxFactory;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 
-import javax.swing.*;
-import java.awt.*;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
- * Sorts lines of text in ascending or descending order.
+ * JavaFX version: Sorts lines of text in ascending or descending order.
  */
-public final class TextSortingTool extends TextTransformer {
+public final class TextSortingToolFx extends TextTransformerFx {
 
     private final ValueProperty<String> direction;
 
-    private TextSortingTool(ToolConfiguration config) {
+    private TextSortingToolFx(ToolConfiguration config) {
         super(config);
         this.direction = registerConfig("sortDirection", "Ascending");
     }
 
     @Override
-    protected void buildUi(JPanel panel) {
-        var configBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
-        configBar.add(new JLabel("Order:"));
-        var combo = new JComboBox<>(new String[]{"Ascending", "Descending"});
-        combo.setSelectedItem(direction.get());
-        combo.addActionListener(e -> {
-            direction.set((String) combo.getSelectedItem());
+    protected void buildUi(BorderPane panel) {
+        var configBar = new HBox(8);
+        configBar.setStyle("-fx-padding: 4 0;");
+        configBar.getChildren().add(new Label("Order:"));
+        var combo = new ComboBox<String>();
+        combo.getItems().addAll("Ascending", "Descending");
+        combo.setValue(direction.get());
+        combo.setOnAction(e -> {
+            direction.set(combo.getValue());
             if (Boolean.TRUE.equals(liveTransformation.get())) transform();
         });
-        configBar.add(combo);
-        panel.add(configBar, BorderLayout.NORTH);
+        configBar.getChildren().add(combo);
+        panel.setTop(configBar);
         super.buildUi(panel);
     }
 
@@ -47,29 +53,27 @@ public final class TextSortingTool extends TextTransformer {
         return sortAscending(input);
     }
 
-    // -- public static sort methods (testable without Swing)
-
     /** Sorts lines alphabetically in ascending order. */
     public static String sortAscending(String input) {
         String[] lines = input.split("\n");
-        java.util.Arrays.sort(lines);
+        Arrays.sort(lines);
         return String.join("\n", lines);
     }
 
     /** Sorts lines alphabetically in descending order. */
     public static String sortDescending(String input) {
         String[] lines = input.split("\n");
-        java.util.Arrays.sort(lines, java.util.Comparator.reverseOrder());
+        Arrays.sort(lines, Comparator.reverseOrder());
         return String.join("\n", lines);
     }
 
-    public static final class Factory implements ToolFactory<TextSortingTool> {
+    public static final class Factory implements ToolFxFactory<TextSortingToolFx> {
         public Factory() {}
         @Override public String getId() { return "text-sorting-transformer"; }
         @Override public ToolPresentation getPresentation() {
             return ToolPresentation.of("text-sorting-transformer",
                     "Text Sorting", "Text Sorting").withGroupId("text");
         }
-        @Override public TextSortingTool create(ToolConfiguration config) { return new TextSortingTool(config); }
+        @Override public TextSortingToolFx create(ToolConfiguration config) { return new TextSortingToolFx(config); }
     }
 }

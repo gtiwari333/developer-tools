@@ -25,6 +25,7 @@ public final class DevToolsAppFx extends Application {
 
     private static SettingsManager settingsManager;
     private static AppSettings appSettings;
+    private static Scene currentScene;
 
     /** Launched reflectively by JavaFX runtime. */
     public DevToolsAppFx() {}
@@ -60,6 +61,7 @@ public final class DevToolsAppFx extends Application {
         // Build the main window
         var mainWindow = new MainWindow(settingsManager, appSettings);
         var scene = new Scene(mainWindow, 1200, 800);
+        currentScene = scene;
 
         // Apply theme
         applyTheme(scene, appSettings.getTheme());
@@ -76,6 +78,18 @@ public final class DevToolsAppFx extends Application {
         primaryStage.show();
         System.out.println("JavaFX: Window visible, size="
                 + primaryStage.getWidth() + "x" + primaryStage.getHeight());
+    }
+
+    /** Apply the given theme to the application. Callable at runtime. */
+    public static void applyTheme(String theme) {
+        if (currentScene == null) return;
+        // Remove previous theme stylesheets (keep any others)
+        currentScene.getStylesheets().clear();
+        currentScene.getRoot().setStyle("");
+        if (!"light".equals(theme)) {
+            applyDarkTheme(currentScene);
+        }
+        appSettings.setTheme(theme);
     }
 
     private static void applyTheme(Scene scene, String theme) {

@@ -36,9 +36,9 @@ public final class CronExpressionToolFx extends TextTransformerFx {
         } catch (Exception e) { return "Invalid cron expression: " + e.getMessage(); }
     }
     public static final class Factory implements ToolFxFactory<CronExpressionToolFx> {
-        public Factory() {} @Override public String getId() { return "cron-expression-fx"; }
+        public Factory() {} @Override public String getId() { return "cron-expression"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("cron-expression-fx", "Cron (FX)", "Cron Expression Editor").withGroupId("formatters"); }
+            return ToolPresentation.of("cron-expression", "Cron Expression", "Cron Expression Editor").withGroupId("formatters"); }
         @Override public CronExpressionToolFx create(ToolConfiguration c) { return new CronExpressionToolFx(c); }
     }
 }

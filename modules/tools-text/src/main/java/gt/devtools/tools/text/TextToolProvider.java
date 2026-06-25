@@ -1,7 +1,7 @@
 package gt.devtools.tools.text;
 
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolProvider;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 
 import java.util.List;
 
@@ -12,15 +12,15 @@ public final class TextToolProvider implements ToolProvider {
     @Override public String getName() { return "Text Utilities"; }
 
     @Override
-    public List<ToolFactory<?>> getTools() {
+    public List<ToolFxFactory<?>> getTools() {
         return List.of(
-                new HashingTool.Factory(),
-                new HmacTool.Factory(),
-                new TextSortingTool.Factory(),
-                new TextCaseTool.Factory(),
-                new TextFilterTool.Factory(),
-                new TextStatisticsTool.Factory(),
-                new TextDiffTool.Factory()
+                new HashingToolFx.Factory(),
+                new HmacToolFx.Factory(),
+                new TextSortingToolFx.Factory(),
+                new TextCaseToolFx.Factory(),
+                new TextFilterToolFx.Factory(),
+                new TextStatisticsToolFx.Factory(),
+                new TextDiffToolFx.Factory()
         );
     }
 }

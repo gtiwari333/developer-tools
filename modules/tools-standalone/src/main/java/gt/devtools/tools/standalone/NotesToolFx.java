@@ -38,9 +38,9 @@ public final class NotesToolFx extends DeveloperToolFx {
     }
 
     public static final class Factory implements ToolFxFactory<NotesToolFx> {
-        public Factory() {} @Override public String getId() { return "notes-fx"; }
+        public Factory() {} @Override public String getId() { return "notes"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("notes-fx", "Notes (FX)", "Notes"); }
+            return ToolPresentation.of("notes", "Notes", "Notes"); }
         @Override public NotesToolFx create(ToolConfiguration c) { return new NotesToolFx(c); }
     }
 }

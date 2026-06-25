@@ -2,20 +2,19 @@ package gt.devtools.tools.standalone;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import gt.devtools.common.ValueProperty;
 import gt.devtools.settings.ToolConfiguration;
 import gt.devtools.tools.api.ToolPresentation;
 import gt.devtools.tools.api.fx.DeveloperToolFx;
 import gt.devtools.tools.api.fx.ToolFxFactory;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
-import java.awt.image.BufferedImage;
 
 public final class QrCodeGeneratorToolFx extends DeveloperToolFx {
     private final ValueProperty<String> text;
@@ -56,15 +55,28 @@ public final class QrCodeGeneratorToolFx extends DeveloperToolFx {
         try {
             QRCodeWriter writer = new QRCodeWriter();
             BitMatrix matrix = writer.encode(t, BarcodeFormat.QR_CODE, 300, 300);
-            BufferedImage img = MatrixToImageWriter.toBufferedImage(matrix);
-            imageView.setImage(SwingFXUtils.toFXImage(img, null));
+            imageView.setImage(bitMatrixToFxImage(matrix));
         } catch (Exception e) { imageView.setImage(null); }
     }
 
+    /** Convert ZXing BitMatrix to JavaFX Image directly (no Swing/AWT dependency). */
+    private static javafx.scene.image.Image bitMatrixToFxImage(BitMatrix matrix) {
+        int w = matrix.getWidth();
+        int h = matrix.getHeight();
+        WritableImage image = new WritableImage(w, h);
+        PixelWriter pw = image.getPixelWriter();
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                pw.setArgb(x, y, matrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+            }
+        }
+        return image;
+    }
+
     public static final class Factory implements ToolFxFactory<QrCodeGeneratorToolFx> {
-        public Factory() {} @Override public String getId() { return "qr-code-generator-fx"; }
+        public Factory() {} @Override public String getId() { return "qr-code-generator"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("qr-code-generator-fx", "QR Code (FX)", "QR Code Generator").withGroupId("creativity"); }
+            return ToolPresentation.of("qr-code-generator", "QR Code", "QR Code Generator").withGroupId("creativity"); }
         @Override public QrCodeGeneratorToolFx create(ToolConfiguration c) { return new QrCodeGeneratorToolFx(c); }
     }
 }

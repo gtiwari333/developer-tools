@@ -10,6 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.security.SecureRandom;
+import java.util.UUID;
+
 /** JavaFX version of UUID generator. */
 public final class UuidGeneratorToolFx extends OneLineTextGeneratorFx {
 
@@ -36,19 +39,33 @@ public final class UuidGeneratorToolFx extends OneLineTextGeneratorFx {
     }
 
     @Override
-    protected String generate() throws Exception {
+    protected String generate() {
         String v = version.get();
-        if (v.startsWith("v1")) return UuidGeneratorTool.generateV1();
-        if (v.startsWith("v7")) return UuidGeneratorTool.generateV7();
-        return UuidGeneratorTool.generateV4();
+        if (v.startsWith("v1")) return generateV1();
+        if (v.startsWith("v7")) return generateV7();
+        return generateV4();
+    }
+
+    public static String generateV4() { return UUID.randomUUID().toString(); }
+    public static String generateV1() {
+        return com.fasterxml.uuid.Generators.timeBasedGenerator().generate().toString();
+    }
+    public static String generateV7() {
+        return com.fasterxml.uuid.Generators.timeBasedEpochGenerator().generate().toString();
+    }
+    public static String generateV3(String namespace, String name) {
+        return UUID.nameUUIDFromBytes((namespace + name).getBytes(java.nio.charset.StandardCharsets.UTF_8)).toString();
+    }
+    public static String generateV6() {
+        return com.fasterxml.uuid.Generators.timeBasedReorderedGenerator().generate().toString();
     }
 
     public static final class Factory implements ToolFxFactory<UuidGeneratorToolFx> {
         public Factory() {}
-        @Override public String getId() { return "uuid-generator-fx"; }
+        @Override public String getId() { return "uuid-generator"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("uuid-generator-fx",
-                    "UUID Generator (FX)", "UUID Generator")
+            return ToolPresentation.of("uuid-generator",
+                    "UUID Generator", "UUID Generator")
                     .withGroupId("crypto");
         }
         @Override public UuidGeneratorToolFx create(ToolConfiguration config) {

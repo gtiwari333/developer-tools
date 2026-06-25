@@ -10,10 +10,16 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 public final class UnitConverterToolFx extends DeveloperToolFx {
     private final ValueProperty<String> category;
     private TextField inputField;
     private VBox resultsBox;
+
+    private static final String[] DATA_SIZE_UNITS = {"bytes", "KB", "MB", "GB", "TB", "PB"};
 
     private UnitConverterToolFx(ToolConfiguration config) {
         super(config); this.category = registerConfig("unitCategory", "Data Size (1024)");
@@ -47,14 +53,35 @@ public final class UnitConverterToolFx extends DeveloperToolFx {
             String cat = category.get();
             double value = Double.parseDouble(inputField.getText().strip());
             if (cat.contains("Number Base")) {
-                for (String line : UnitConverterTool.convertNumberBases((long) value))
+                for (String line : convertNumberBases((long) value))
                     resultsBox.getChildren().add(makeLabel(line));
             } else {
                 int base = cat.contains("1000") ? 1000 : 1024;
-                for (var e : UnitConverterTool.convertDataSize(value, base).entrySet())
+                for (var e : convertDataSize(value, base).entrySet())
                     resultsBox.getChildren().add(makeLabel(String.format("%,.2f %s", e.getValue(), e.getKey())));
             }
         } catch (NumberFormatException e) { resultsBox.getChildren().add(makeLabel("Invalid number")); }
+    }
+
+    public static List<String> convertNumberBases(long value) {
+        return List.of(
+            "Binary:     " + Long.toBinaryString(value),
+            "Octal:      " + Long.toOctalString(value),
+            "Decimal:    " + value,
+            "Hex:        " + Long.toHexString(value).toUpperCase(),
+            "Hex (0x):   " + "0x" + Long.toHexString(value).toUpperCase()
+        );
+    }
+
+    public static Map<String, Double> convertDataSize(double bytes, int base) {
+        var result = new LinkedHashMap<String, Double>();
+        result.put(DATA_SIZE_UNITS[0], bytes);
+        double v = bytes;
+        for (int i = 1; i < DATA_SIZE_UNITS.length; i++) {
+            v /= base;
+            result.put(DATA_SIZE_UNITS[i], v);
+        }
+        return result;
     }
 
     private Label makeLabel(String text) {
@@ -65,9 +92,9 @@ public final class UnitConverterToolFx extends DeveloperToolFx {
     }
 
     public static final class Factory implements ToolFxFactory<UnitConverterToolFx> {
-        public Factory() {} @Override public String getId() { return "units-converter-fx"; }
+        public Factory() {} @Override public String getId() { return "units-converter"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("units-converter-fx", "Unit Converter (FX)", "Unit Converter").withGroupId("formatters"); }
+            return ToolPresentation.of("units-converter", "Unit Converter", "Unit Converter").withGroupId("formatters"); }
         @Override public UnitConverterToolFx create(ToolConfiguration c) { return new UnitConverterToolFx(c); }
     }
 }

@@ -58,9 +58,9 @@ public final class RubberDuckToolFx extends DeveloperToolFx {
     }
 
     public static final class Factory implements ToolFxFactory<RubberDuckToolFx> {
-        public Factory() {} @Override public String getId() { return "rubber-duck-fx"; }
+        public Factory() {} @Override public String getId() { return "rubber-duck"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("rubber-duck-fx", "Rubber Duck (FX)", "Rubber Duck Debugging"); }
+            return ToolPresentation.of("rubber-duck", "Rubber Duck", "Rubber Duck Debugging"); }
         @Override public RubberDuckToolFx create(ToolConfiguration c) { return new RubberDuckToolFx(c); }
     }
 }

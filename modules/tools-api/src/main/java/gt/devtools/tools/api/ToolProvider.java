@@ -1,5 +1,7 @@
 package gt.devtools.tools.api;
 
+import gt.devtools.tools.api.fx.ToolFxFactory;
+
 import java.util.List;
 
 /**
@@ -23,5 +25,5 @@ public interface ToolProvider {
     /**
      * All tool factories contributed by this provider.
      */
-    List<ToolFactory<?>> getTools();
+    List<ToolFxFactory<?>> getTools();
 }

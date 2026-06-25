@@ -28,9 +28,9 @@ public final class JsonPathToolFx extends TextTransformerFx {
         } catch (Exception e) { return "JSONPath error: " + e.getMessage(); }
     }
     public static final class Factory implements ToolFxFactory<JsonPathToolFx> {
-        public Factory() {} @Override public String getId() { return "json-path-fx"; }
+        public Factory() {} @Override public String getId() { return "json-path"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("json-path-fx", "JSON Path (FX)", "JSON Path Evaluator").withGroupId("text"); }
+            return ToolPresentation.of("json-path", "JSON Path", "JSON Path Evaluator").withGroupId("text"); }
         @Override public JsonPathToolFx create(ToolConfiguration c) { return new JsonPathToolFx(c); }
     }
 }

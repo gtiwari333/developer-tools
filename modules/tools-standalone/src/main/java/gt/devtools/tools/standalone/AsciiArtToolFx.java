@@ -51,9 +51,9 @@ public final class AsciiArtToolFx extends DeveloperToolFx {
     }
 
     public static final class Factory implements ToolFxFactory<AsciiArtToolFx> {
-        public Factory() {} @Override public String getId() { return "ascii-art-fx"; }
+        public Factory() {} @Override public String getId() { return "ascii-art"; }
         @Override public ToolPresentation getPresentation() {
-            return ToolPresentation.of("ascii-art-fx", "ASCII Art (FX)", "ASCII Art Generator").withGroupId("creativity"); }
+            return ToolPresentation.of("ascii-art", "ASCII Art", "ASCII Art Generator").withGroupId("creativity"); }
         @Override public AsciiArtToolFx create(ToolConfiguration c) { return new AsciiArtToolFx(c); }
     }
 }

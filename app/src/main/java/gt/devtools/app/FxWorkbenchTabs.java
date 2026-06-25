@@ -1,32 +1,33 @@
 package gt.devtools.app;
 
 import gt.devtools.settings.SettingsManager;
-import gt.devtools.tools.api.ToolFactory;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
+import gt.devtools.settings.ToolConfiguration;
+import gt.devtools.tools.api.fx.DeveloperToolFx;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
- * JavaFX version of WorkbenchTabbedPane.
+ * JavaFX workbench tabs for a single tool type.
  * <p>
  * Manages multiple workbenches (nested tabs) for the same tool.
- * Phase 1: Shows placeholder content; actual tool UIs are still Swing.
- * Phase 2: Will host JavaFX versions of tools after base classes are ported.
+ * Each workbench is a separate instance of the DeveloperToolFx.
  */
 public final class FxWorkbenchTabs extends BorderPane {
 
-    private final ToolFactory<?> factory;
+    private final ToolFxFactory<?> factory;
     private final SettingsManager settingsManager;
     private final TabPane workbenchTabs;
+    private final List<Tab> tabs = new ArrayList<>();
+    private final List<DeveloperToolFx> tools = new ArrayList<>();
     private Runnable onEmpty;
 
-    public FxWorkbenchTabs(ToolFactory<?> factory, SettingsManager settingsManager) {
+    public FxWorkbenchTabs(ToolFxFactory<?> factory, SettingsManager settingsManager) {
         this.factory = factory;
         this.settingsManager = settingsManager;
 
@@ -46,9 +47,15 @@ public final class FxWorkbenchTabs extends BorderPane {
             }
         });
 
-        workbenchTabs.getSelectionModel().selectedItemProperty().addListener(
-                (obs, old, tab) -> {
-                    // Activation/deactivation handled by Swing internals via SwingNode
+        // Activation/deactivation on tab selection
+        workbenchTabs.getSelectionModel().selectedIndexProperty().addListener(
+                (obs, oldIdx, newIdx) -> {
+                    if (oldIdx.intValue() >= 0 && oldIdx.intValue() < tools.size()) {
+                        tools.get(oldIdx.intValue()).deactivated();
+                    }
+                    if (newIdx.intValue() >= 0 && newIdx.intValue() < tools.size()) {
+                        tools.get(newIdx.intValue()).activated();
+                    }
                 });
 
         setCenter(workbenchTabs);
@@ -63,28 +70,53 @@ public final class FxWorkbenchTabs extends BorderPane {
 
     /** Create a new workbench tab for this tool. */
     public void newWorkbench() {
-        int count = workbenchTabs.getTabs().size() + 1;
+        int count = tabs.size() + 1;
 
         String title = factory.getPresentation().contentTitle();
         if (count > 1) title += " (" + count + ")";
 
+        // Create Fx tool instance directly (no Swing interop needed)
+        var config = new ToolConfiguration(
+                UUID.randomUUID(), factory.getPresentation().contentTitle());
+        var fxTool = factory.create(config);
+        var fxNode = fxTool.createComponent();
+
         var tab = new Tab(title);
-        // Phase 2: embed Swing tool via SwingNode interop
-        tab.setContent(buildSwingInterop());
+        tab.setContent(fxNode);
         tab.setClosable(true);
 
+        tabs.add(tab);
+        tools.add(fxTool);
         workbenchTabs.getTabs().add(tab);
         workbenchTabs.getSelectionModel().select(tab);
+
+        // Track removal for cleanup
+        tab.setOnClosed(e -> {
+            int idx = tabs.indexOf(tab);
+            if (idx >= 0 && idx < tools.size()) {
+                tools.get(idx).dispose();
+                tools.remove(idx);
+            }
+            tabs.remove(tab);
+        });
+
+        fxTool.activated();
     }
 
-    /** Called when this tab becomes the selected one in the parent TabPane. */
+    /** Called when this tool tab becomes the selected one in the parent TabPane. */
     public void activate() {
-        // Tool activation handled by Swing internals
+        int idx = workbenchTabs.getSelectionModel().getSelectedIndex();
+        if (idx >= 0 && idx < tools.size()) {
+            tools.get(idx).activated();
+        }
     }
 
-    /** Called when this tab is deselected in the parent TabPane. */
+    /** Called when this tool tab is deselected in the parent TabPane. */
     public void deactivate() {
-        // Tool deactivation handled by Swing internals
+        int idx = workbenchTabs.getSelectionModel().getSelectedIndex();
+        if (idx >= 0 && idx < tools.size()) {
+            tools.get(idx).deactivated();
+        }
     }
 
     // ---------------------------------------------------------------
@@ -92,36 +124,10 @@ public final class FxWorkbenchTabs extends BorderPane {
     // ---------------------------------------------------------------
 
     public void resetCurrentWorkbench() {
-        // Phase 2: tool.reset() called via Swing internals
-    }
-
-    // ---------------------------------------------------------------
-    // Tool creation (Phase 3: FX-first, fallback to Swing interop)
-    // ---------------------------------------------------------------
-
-    private BorderPane buildSwingInterop() {
-        var pane = new BorderPane();
-        pane.setPadding(new Insets(0));
-
-        // Try JavaFX tool first
-        var config = new gt.devtools.settings.ToolConfiguration(
-                java.util.UUID.randomUUID(), factory.getPresentation().contentTitle());
-        var fxTool = FxToolRegistry.createFxTool(factory.getId(), config);
-
-        if (fxTool != null) {
-            var fxNode = fxTool.createComponent();
-            pane.setCenter(fxNode);
-            System.out.println("JavaFX: Using native FX tool for " + factory.getId());
-        } else {
-            // Fall back to Swing interop
-            var swingNode = new javafx.embed.swing.SwingNode();
-            var tool = factory.create(config);
-            var swingComponent = tool.createComponent();
-            javafx.application.Platform.runLater(() ->
-                    swingNode.setContent(swingComponent));
-            pane.setCenter(swingNode);
+        int idx = workbenchTabs.getSelectionModel().getSelectedIndex();
+        if (idx >= 0 && idx < tools.size()) {
+            tools.get(idx).reset();
         }
-        return pane;
     }
 
     // ---------------------------------------------------------------
@@ -129,7 +135,9 @@ public final class FxWorkbenchTabs extends BorderPane {
     // ---------------------------------------------------------------
 
     public void saveConfigs(SettingsManager sm) {
-        // Phase 2: save per-workbench configs
+        for (var tool : tools) {
+            sm.saveToolConfig(tool.getConfig());
+        }
     }
 
     public void setOnEmpty(Runnable handler) {
