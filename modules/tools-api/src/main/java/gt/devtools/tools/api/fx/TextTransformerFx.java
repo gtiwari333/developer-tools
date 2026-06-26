@@ -77,7 +77,7 @@ public abstract class TextTransformerFx extends DeveloperToolFx {
 
     @Override
     public void activated() {
-        sourceEditor.getTextArea().textProperty().addListener((obs, old, text) -> {
+        sourceEditor.textProperty().addListener((obs, old, text) -> {
             if (Boolean.TRUE.equals(liveTransformation.get())) transform();
         });
     }

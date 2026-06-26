@@ -7,6 +7,8 @@ module gt.devtools.tools.api {
 
     requires javafx.controls;
     requires javafx.graphics;
+    requires org.fxmisc.richtext;
+    requires org.fxmisc.flowless;
 
     exports gt.devtools.tools.api;
     exports gt.devtools.tools.api.fx;

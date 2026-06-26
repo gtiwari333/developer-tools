@@ -1,15 +1,15 @@
 package gt.devtools.tools.api.fx;
 
 import gt.devtools.common.ValueProperty;
-import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.LineNumberFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,27 +17,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * JavaFX text editor panel replacing RSyntaxTextArea with JavaFX TextArea.
+ * JavaFX text editor panel backed by RichTextFX {@link CodeArea}.
  * <p>
  * Features:
  * <ul>
+ *   <li>Line numbers in the gutter (default on, toggle via {@link #setShowLineNumbers})</li>
  *   <li>INPUT / OUTPUT modes (editable vs read-only)</li>
  *   <li>Bi-directional binding to {@link ValueProperty} for persistence</li>
  *   <li>Status bar showing character / line / byte counts</li>
  *   <li>File load / save helpers</li>
  *   <li>Clipboard copy</li>
- *   <li>Syntax style hint (styling applied via CSS in Phase 5)</li>
+ *   <li>Syntax style hint (monospaced font for code formats)</li>
  * </ul>
  */
 public class FxTextEditor extends BorderPane {
 
     public enum Mode { INPUT, OUTPUT }
 
-    private final TextArea textArea;
+    private final CodeArea codeArea;
+    private final VirtualizedScrollPane<CodeArea> scrollPane;
     private final ValueProperty<String> textProperty;
     private final Label statusLabel;
     private Path loadedFile;
     private String syntaxStyle = "text/plain";
+    private boolean showLineNumbers = true;
 
     public FxTextEditor(Mode mode) {
         this(mode, null);
@@ -46,31 +49,33 @@ public class FxTextEditor extends BorderPane {
     public FxTextEditor(Mode mode, ValueProperty<String> textProperty) {
         this.textProperty = textProperty;
 
-        // -- Text area
-        textArea = new TextArea();
-        textArea.setWrapText(true);
-        textArea.setPrefRowCount(20);
-        textArea.setPrefColumnCount(60);
+        // -- Code area (RichTextFX)
+        codeArea = new CodeArea();
+        codeArea.setWrapText(true);
+        codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+        codeArea.setStyle("-fx-font-size: 13px;");
 
         if (mode == Mode.OUTPUT) {
-            textArea.setEditable(false);
-            textArea.setStyle("-fx-control-inner-background: #f0f0f0;");
+            codeArea.setEditable(false);
+            codeArea.setStyle("-fx-font-size: 13px; -fx-background-color: #f0f0f0;");
         }
 
         // Restore persisted text
         if (textProperty != null && textProperty.get() != null) {
-            textArea.setText(textProperty.get());
+            codeArea.replaceText(textProperty.get());
         }
 
         // Sync edits back to property
-        textArea.textProperty().addListener((obs, old, text) -> {
-            if (textProperty != null && textArea.isEditable()) {
+        codeArea.textProperty().addListener((obs, old, text) -> {
+            if (textProperty != null && codeArea.isEditable()) {
                 textProperty.set(text);
             }
             updateStatus();
         });
 
-        setCenter(textArea);
+        // Wrap in VirtualizedScrollPane for proper scrolling + virtualisation
+        scrollPane = new VirtualizedScrollPane<>(codeArea);
+        setCenter(scrollPane);
 
         // -- Status bar
         statusLabel = new Label(" ");
@@ -81,6 +86,7 @@ public class FxTextEditor extends BorderPane {
                 + "-fx-border-color: -fx-box-border; -fx-border-width: 1 0 0 0;");
         setBottom(statusBar);
 
+        setPrefSize(500, 300);
         updateStatus();
     }
 
@@ -88,11 +94,17 @@ public class FxTextEditor extends BorderPane {
     // Text accessors
     // ---------------------------------------------------------------
 
-    public TextArea getTextArea() { return textArea; }
+    /** Returns the underlying RichTextFX {@link CodeArea} for advanced customization. */
+    public CodeArea getCodeArea() { return codeArea; }
 
-    public String getText() { return textArea.getText(); }
+    /** Returns the text property for listener registration without reaching into the CodeArea. */
+    public ObservableValue<String> textProperty() { return codeArea.textProperty(); }
 
-    public void setText(String text) { textArea.setText(text != null ? text : ""); }
+    public String getText() { return codeArea.getText(); }
+
+    public void setText(String text) {
+        codeArea.replaceText(text != null ? text : "");
+    }
 
     public byte[] getBytes() {
         return getText().getBytes(StandardCharsets.UTF_8);
@@ -108,16 +120,28 @@ public class FxTextEditor extends BorderPane {
 
     public void setSyntaxStyle(String style) {
         this.syntaxStyle = style;
-        // Phase 5: apply CSS classes based on syntax style
         if (style != null) {
-            if (style.contains("json")) textArea.setStyle("-fx-font-family: 'Monospaced';");
-            else if (style.contains("sql")) textArea.setStyle("-fx-font-family: 'Monospaced';");
-            else if (style.contains("xml")) textArea.setStyle("-fx-font-family: 'Monospaced';");
-            else if (style.contains("markdown")) textArea.setStyle("-fx-font-family: 'Monospaced';");
+            var monoStyles = java.util.Set.of("text/json", "text/sql", "text/xml",
+                    "text/markdown", "text/java", "text/python", "text/javascript",
+                    "text/css", "text/yaml", "text/plain");
+            if (monoStyles.contains(style)) {
+                codeArea.setStyle(codeArea.getStyle() + "; -fx-font-family: 'Monospaced';");
+            }
         }
     }
 
-    public void setEditable(boolean editable) { textArea.setEditable(editable); }
+    public void setShowLineNumbers(boolean show) {
+        this.showLineNumbers = show;
+        if (show) {
+            codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
+        } else {
+            codeArea.setParagraphGraphicFactory(null);
+        }
+    }
+
+    public boolean isShowLineNumbers() { return showLineNumbers; }
+
+    public void setEditable(boolean editable) { codeArea.setEditable(editable); }
 
     // ---------------------------------------------------------------
     // Actions
@@ -125,7 +149,7 @@ public class FxTextEditor extends BorderPane {
 
     public void copyToClipboard() {
         var content = new ClipboardContent();
-        content.putString(textArea.getText());
+        content.putString(codeArea.getText());
         Clipboard.getSystemClipboard().setContent(content);
     }
 
@@ -146,7 +170,7 @@ public class FxTextEditor extends BorderPane {
     // ---------------------------------------------------------------
 
     private void updateStatus() {
-        String text = textArea.getText();
+        String text = codeArea.getText();
         int chars = text.length();
         int lines = chars == 0 ? 0 : text.split("\n", -1).length;
         long bytes = getBytes().length;

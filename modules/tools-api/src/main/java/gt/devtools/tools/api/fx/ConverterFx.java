@@ -66,7 +66,7 @@ public abstract class ConverterFx extends DeveloperToolFx {
 
     protected FxTextEditor createSourceEditor() {
         var editor = new FxTextEditor(FxTextEditor.Mode.INPUT, sourceTextProperty());
-        editor.getTextArea().textProperty().addListener((obs, old, text) -> onSourceChanged());
+        editor.textProperty().addListener((obs, old, text) -> onSourceChanged());
         return editor;
     }
 
