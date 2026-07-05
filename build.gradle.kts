@@ -1,6 +1,7 @@
 plugins {
     java
     id("org.graalvm.buildtools.native") version "0.10.5" apply false
+    id("org.openjfx.javafxplugin") version "0.1.0" apply false
 }
 
 allprojects {

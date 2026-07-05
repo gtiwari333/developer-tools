@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("TextCaseTool static methods")
+@DisplayName("TextCaseToolFx static methods")
 class TextCaseToolTest {
 
     // -- toTitleCase
@@ -15,25 +15,25 @@ class TextCaseToolTest {
     @Test
     @DisplayName("toTitleCase: capitalizes first letter of each word")
     void titleCaseBasic() {
-        assertThat(TextCaseTool.toTitleCase("hello world")).isEqualTo("Hello World");
+        assertThat(TextCaseToolFx.toTitleCase("hello world")).isEqualTo("Hello World");
     }
 
     @Test
     @DisplayName("toTitleCase: lowercases subsequent letters")
     void titleCaseLowercasesRest() {
-        assertThat(TextCaseTool.toTitleCase("hELLO wORLD")).isEqualTo("Hello World");
+        assertThat(TextCaseToolFx.toTitleCase("hELLO wORLD")).isEqualTo("Hello World");
     }
 
     @Test
     @DisplayName("toTitleCase: single word")
     void titleCaseSingleWord() {
-        assertThat(TextCaseTool.toTitleCase("hello")).isEqualTo("Hello");
+        assertThat(TextCaseToolFx.toTitleCase("hello")).isEqualTo("Hello");
     }
 
     @Test
     @DisplayName("toTitleCase: empty string")
     void titleCaseEmpty() {
-        assertThat(TextCaseTool.toTitleCase("")).isEmpty();
+        assertThat(TextCaseToolFx.toTitleCase("")).isEmpty();
     }
 
     // -- toCamelCase
@@ -41,25 +41,25 @@ class TextCaseToolTest {
     @Test
     @DisplayName("toCamelCase: basic conversion")
     void camelCaseBasic() {
-        assertThat(TextCaseTool.toCamelCase("hello world")).isEqualTo("helloWorld");
+        assertThat(TextCaseToolFx.toCamelCase("hello world")).isEqualTo("helloWorld");
     }
 
     @Test
     @DisplayName("toCamelCase: from snake_case")
     void camelCaseFromSnake() {
-        assertThat(TextCaseTool.toCamelCase("hello_world_example")).isEqualTo("helloWorldExample");
+        assertThat(TextCaseToolFx.toCamelCase("hello_world_example")).isEqualTo("helloWorldExample");
     }
 
     @Test
     @DisplayName("toCamelCase: from kebab-case")
     void camelCaseFromKebab() {
-        assertThat(TextCaseTool.toCamelCase("hello-world-example")).isEqualTo("helloWorldExample");
+        assertThat(TextCaseToolFx.toCamelCase("hello-world-example")).isEqualTo("helloWorldExample");
     }
 
     @Test
     @DisplayName("toCamelCase: single word stays lowercase")
     void camelCaseSingleWord() {
-        assertThat(TextCaseTool.toCamelCase("HELLO")).isEqualTo("hello");
+        assertThat(TextCaseToolFx.toCamelCase("HELLO")).isEqualTo("hello");
     }
 
     // -- toPascalCase
@@ -67,19 +67,19 @@ class TextCaseToolTest {
     @Test
     @DisplayName("toPascalCase: basic conversion")
     void pascalCaseBasic() {
-        assertThat(TextCaseTool.toPascalCase("hello world")).isEqualTo("HelloWorld");
+        assertThat(TextCaseToolFx.toPascalCase("hello world")).isEqualTo("HelloWorld");
     }
 
     @Test
     @DisplayName("toPascalCase: from snake_case")
     void pascalCaseFromSnake() {
-        assertThat(TextCaseTool.toPascalCase("hello_world")).isEqualTo("HelloWorld");
+        assertThat(TextCaseToolFx.toPascalCase("hello_world")).isEqualTo("HelloWorld");
     }
 
     @Test
     @DisplayName("toPascalCase: single word")
     void pascalCaseSingleWord() {
-        assertThat(TextCaseTool.toPascalCase("hello")).isEqualTo("Hello");
+        assertThat(TextCaseToolFx.toPascalCase("hello")).isEqualTo("Hello");
     }
 
     // -- toSnakeCase
@@ -87,25 +87,25 @@ class TextCaseToolTest {
     @Test
     @DisplayName("toSnakeCase: spaces to underscores")
     void snakeCaseSpaces() {
-        assertThat(TextCaseTool.toSnakeCase("hello world")).isEqualTo("hello_world");
+        assertThat(TextCaseToolFx.toSnakeCase("hello world")).isEqualTo("hello_world");
     }
 
     @Test
     @DisplayName("toSnakeCase: hyphens to underscores")
     void snakeCaseHyphens() {
-        assertThat(TextCaseTool.toSnakeCase("hello-world")).isEqualTo("hello_world");
+        assertThat(TextCaseToolFx.toSnakeCase("hello-world")).isEqualTo("hello_world");
     }
 
     @Test
     @DisplayName("toSnakeCase: lowercases")
     void snakeCaseLowercases() {
-        assertThat(TextCaseTool.toSnakeCase("Hello World")).isEqualTo("hello_world");
+        assertThat(TextCaseToolFx.toSnakeCase("Hello World")).isEqualTo("hello_world");
     }
 
     @Test
     @DisplayName("toSnakeCase: trims whitespace")
     void snakeCaseTrims() {
-        assertThat(TextCaseTool.toSnakeCase("  hello world  ")).isEqualTo("hello_world");
+        assertThat(TextCaseToolFx.toSnakeCase("  hello world  ")).isEqualTo("hello_world");
     }
 
     // -- toKebabCase
@@ -113,19 +113,19 @@ class TextCaseToolTest {
     @Test
     @DisplayName("toKebabCase: spaces to hyphens")
     void kebabCaseSpaces() {
-        assertThat(TextCaseTool.toKebabCase("hello world")).isEqualTo("hello-world");
+        assertThat(TextCaseToolFx.toKebabCase("hello world")).isEqualTo("hello-world");
     }
 
     @Test
     @DisplayName("toKebabCase: underscores to hyphens")
     void kebabCaseUnderscores() {
-        assertThat(TextCaseTool.toKebabCase("hello_world")).isEqualTo("hello-world");
+        assertThat(TextCaseToolFx.toKebabCase("hello_world")).isEqualTo("hello-world");
     }
 
     @Test
     @DisplayName("toKebabCase: lowercases")
     void kebabCaseLowercases() {
-        assertThat(TextCaseTool.toKebabCase("Hello World")).isEqualTo("hello-world");
+        assertThat(TextCaseToolFx.toKebabCase("Hello World")).isEqualTo("hello-world");
     }
 
     // -- toConstantCase
@@ -133,13 +133,13 @@ class TextCaseToolTest {
     @Test
     @DisplayName("toConstantCase: spaces to underscores, uppercase")
     void constantCaseSpaces() {
-        assertThat(TextCaseTool.toConstantCase("hello world")).isEqualTo("HELLO_WORLD");
+        assertThat(TextCaseToolFx.toConstantCase("hello world")).isEqualTo("HELLO_WORLD");
     }
 
     @Test
     @DisplayName("toConstantCase: hyphens to underscores, uppercase")
     void constantCaseHyphens() {
-        assertThat(TextCaseTool.toConstantCase("hello-world")).isEqualTo("HELLO_WORLD");
+        assertThat(TextCaseToolFx.toConstantCase("hello-world")).isEqualTo("HELLO_WORLD");
     }
 
     // -- edge cases
@@ -153,10 +153,10 @@ class TextCaseToolTest {
     })
     @DisplayName("round-trip consistency across case formats")
     void caseConversionConsistency(String input, String camel, String pascal, String snake, String kebab, String constant) {
-        assertThat(TextCaseTool.toCamelCase(input)).isEqualTo(camel);
-        assertThat(TextCaseTool.toPascalCase(input)).isEqualTo(pascal);
-        assertThat(TextCaseTool.toSnakeCase(input)).isEqualTo(snake);
-        assertThat(TextCaseTool.toKebabCase(input)).isEqualTo(kebab);
-        assertThat(TextCaseTool.toConstantCase(input)).isEqualTo(constant);
+        assertThat(TextCaseToolFx.toCamelCase(input)).isEqualTo(camel);
+        assertThat(TextCaseToolFx.toPascalCase(input)).isEqualTo(pascal);
+        assertThat(TextCaseToolFx.toSnakeCase(input)).isEqualTo(snake);
+        assertThat(TextCaseToolFx.toKebabCase(input)).isEqualTo(kebab);
+        assertThat(TextCaseToolFx.toConstantCase(input)).isEqualTo(constant);
     }
 }

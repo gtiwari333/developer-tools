@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("UlidGeneratorTool")
+@DisplayName("UlidGeneratorToolFx")
 class UlidGeneratorToolTest {
 
     @Test @DisplayName("ULID format is 26 characters")

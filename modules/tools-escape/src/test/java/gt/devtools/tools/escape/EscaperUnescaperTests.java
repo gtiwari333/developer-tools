@@ -12,14 +12,14 @@ class EscaperUnescaperTests {
     @Test @DisplayName("HTML: escape then unescape returns original")
     void htmlRoundTrip() {
         String input = "<div class=\"test\">Hello & World</div>";
-        String escaped = HtmlEntitiesEscaperUnescaper.escape(input);
-        String unescaped = HtmlEntitiesEscaperUnescaper.unescape(escaped);
+        String escaped = HtmlEntitiesEscaperUnescaperFx.escape(input);
+        String unescaped = HtmlEntitiesEscaperUnescaperFx.unescape(escaped);
         assertThat(unescaped).isEqualTo(input);
     }
 
     @Test @DisplayName("HTML: escapes special characters")
     void htmlEscapes() {
-        String result = HtmlEntitiesEscaperUnescaper.escape("<tag>");
+        String result = HtmlEntitiesEscaperUnescaperFx.escape("<tag>");
         assertThat(result).contains("&lt;").contains("&gt;");
         assertThat(result).doesNotContain("<tag>");
     }
@@ -27,56 +27,56 @@ class EscaperUnescaperTests {
     @Test @DisplayName("Java: escape then unescape returns original")
     void javaRoundTrip() {
         String input = "hello\nworld\t\"test\"";
-        String escaped = JavaStringEscaperUnescaper.escape(input);
-        String unescaped = JavaStringEscaperUnescaper.unescape(escaped);
+        String escaped = JavaStringEscaperUnescaperFx.escape(input);
+        String unescaped = JavaStringEscaperUnescaperFx.unescape(escaped);
         assertThat(unescaped).isEqualTo(input);
     }
 
     @Test @DisplayName("Java: escapes special characters")
     void javaEscapes() {
-        String result = JavaStringEscaperUnescaper.escape("a\nb");
+        String result = JavaStringEscaperUnescaperFx.escape("a\nb");
         assertThat(result).contains("\\n");
     }
 
     @Test @DisplayName("JSON: escape then unescape returns original")
     void jsonRoundTrip() {
         String input = "hello \"world\"\nline2";
-        String escaped = JsonTextEscaperUnescaper.escape(input);
-        String unescaped = JsonTextEscaperUnescaper.unescape(escaped);
+        String escaped = JsonTextEscaperUnescaperFx.escape(input);
+        String unescaped = JsonTextEscaperUnescaperFx.unescape(escaped);
         assertThat(unescaped).isEqualTo(input);
     }
 
     @Test @DisplayName("JSON: escapes double quotes")
     void jsonEscapes() {
-        String result = JsonTextEscaperUnescaper.escape("a\"b");
+        String result = JsonTextEscaperUnescaperFx.escape("a\"b");
         assertThat(result).contains("\\\"");
     }
 
     @Test @DisplayName("XML: escape then unescape returns original")
     void xmlRoundTrip() {
         String input = "<root attr=\"val\">text</root>";
-        String escaped = XmlTextEscaperUnescaper.escape(input);
-        String unescaped = XmlTextEscaperUnescaper.unescape(escaped);
+        String escaped = XmlTextEscaperUnescaperFx.escape(input);
+        String unescaped = XmlTextEscaperUnescaperFx.unescape(escaped);
         assertThat(unescaped).isEqualTo(input);
     }
 
     @Test @DisplayName("XML: escapes special characters")
     void xmlEscapes() {
-        String result = XmlTextEscaperUnescaper.escape("<tag>");
+        String result = XmlTextEscaperUnescaperFx.escape("<tag>");
         assertThat(result).contains("&lt;").contains("&gt;");
     }
 
     @Test @DisplayName("CSV: escape then unescape returns original")
     void csvRoundTrip() {
         String input = "hello, \"world\"";
-        String escaped = CsvTextEscaperUnescaper.escape(input);
-        String unescaped = CsvTextEscaperUnescaper.unescape(escaped);
+        String escaped = CsvTextEscaperUnescaperFx.escape(input);
+        String unescaped = CsvTextEscaperUnescaperFx.unescape(escaped);
         assertThat(unescaped).isEqualTo(input);
     }
 
     @Test @DisplayName("CSV: normal text unchanged")
     void csvNormalText() {
-        String result = CsvTextEscaperUnescaper.escape("simple");
+        String result = CsvTextEscaperUnescaperFx.escape("simple");
         assertThat(result).isEqualTo("simple");
     }
 }

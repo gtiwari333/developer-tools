@@ -1,5 +1,7 @@
 package gt.devtools.tools.api;
 
+import gt.devtools.tools.api.fx.ToolFxFactory;
+
 import java.util.*;
 
 /**
@@ -21,8 +23,8 @@ public final class ToolRegistry {
     private static final ToolRegistry INSTANCE = new ToolRegistry();
 
     private final List<ToolGroupDescriptor> groups = new ArrayList<>();
-    private final Map<String, ToolFactory<?>> tools = new LinkedHashMap<>();
-    private final Map<String, List<ToolFactory<?>>> toolsByGroup = new LinkedHashMap<>();
+    private final Map<String, ToolFxFactory<?>> tools = new LinkedHashMap<>();
+    private final Map<String, List<ToolFxFactory<?>>> toolsByGroup = new LinkedHashMap<>();
     private final List<Runnable> reloadListeners = new ArrayList<>();
     private boolean loaded;
 
@@ -54,7 +56,7 @@ public final class ToolRegistry {
     // ---------------------------------------------------------------
 
     /** Register a tool factory (called automatically during discovery). */
-    public void register(ToolFactory<?> factory) {
+    public void register(ToolFxFactory<?> factory) {
         var pres = factory.getPresentation();
         tools.put(pres.id(), factory);
         String groupId = pres.groupId();
@@ -73,16 +75,16 @@ public final class ToolRegistry {
     // ---------------------------------------------------------------
 
     /** Look up a tool factory by its stable id. */
-    public ToolFactory<?> getTool(String id) { return tools.get(id); }
+    public ToolFxFactory<?> getTool(String id) { return tools.get(id); }
 
     /** All registered tool factories in insertion order. */
-    public List<ToolFactory<?>> getAllTools() { return List.copyOf(tools.values()); }
+    public List<ToolFxFactory<?>> getAllTools() { return List.copyOf(tools.values()); }
 
     /** All registered groups. */
     public List<ToolGroupDescriptor> getGroups() { return List.copyOf(groups); }
 
     /** Tools belonging to a specific group, or an empty list. */
-    public List<ToolFactory<?>> getToolsByGroup(String groupId) {
+    public List<ToolFxFactory<?>> getToolsByGroup(String groupId) {
         return toolsByGroup.getOrDefault(groupId, List.of());
     }
 

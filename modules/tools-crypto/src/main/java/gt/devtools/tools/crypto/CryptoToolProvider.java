@@ -1,7 +1,7 @@
 package gt.devtools.tools.crypto;
 
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolProvider;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 
 import java.util.List;
 
@@ -12,13 +12,13 @@ public final class CryptoToolProvider implements ToolProvider {
     @Override public String getName() { return "Cryptography"; }
 
     @Override
-    public List<ToolFactory<?>> getTools() {
+    public List<ToolFxFactory<?>> getTools() {
         return List.of(
-                new UuidGeneratorTool.Factory(),
-                new NanoIdGeneratorTool.Factory(),
-                new UlidGeneratorTool.Factory(),
-                new PasswordGeneratorTool.Factory(),
-                new LoremIpsumGeneratorTool.Factory()
+                new UuidGeneratorToolFx.Factory(),
+                new NanoIdGeneratorToolFx.Factory(),
+                new UlidGeneratorToolFx.Factory(),
+                new PasswordGeneratorToolFx.Factory(),
+                new LoremIpsumGeneratorToolFx.Factory()
         );
     }
 }

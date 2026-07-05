@@ -3,7 +3,8 @@ import gt.devtools.tools.standalone.StandaloneToolProvider;
 
 module gt.devtools.tools.standalone {
     requires transitive gt.devtools.tools.api;
-    requires java.desktop;
+    requires javafx.controls;
+    requires javafx.graphics;
     requires jdk.httpserver;
     requires tools.jackson.databind;
     requires tools.jackson.dataformat.yaml;

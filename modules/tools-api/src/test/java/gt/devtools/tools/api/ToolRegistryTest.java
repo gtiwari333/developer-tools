@@ -1,5 +1,7 @@
 package gt.devtools.tools.api;
 
+import gt.devtools.tools.api.fx.DeveloperToolFx;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +40,7 @@ class ToolRegistryTest {
         registry.register(new TestToolFactory("tool-1", "Tool 1", "Tool 1", "group-a"));
         registry.register(new TestToolFactory("tool-2", "Tool 2", "Tool 2", "group-b"));
 
-        List<ToolFactory<?>> all = registry.getAllTools();
+        List<ToolFxFactory<?>> all = registry.getAllTools();
 
         assertThat(all).hasSizeGreaterThanOrEqualTo(2);
         assertThat(all.stream().map(f -> f.getPresentation().id()))
@@ -108,14 +110,14 @@ class ToolRegistryTest {
     // -- helper
 
     private record TestToolFactory(String id, String menuTitle, String contentTitle, String groupId)
-            implements ToolFactory<DeveloperTool> {
+            implements ToolFxFactory<DeveloperToolFx> {
         @Override public String getId() { return id; }
         @Override
         public ToolPresentation getPresentation() {
-            return new ToolPresentation(id, menuTitle, contentTitle, groupId, false, false, null);
+            return ToolPresentation.of(id, menuTitle, contentTitle).withGroupId(groupId);
         }
         /** Never called by registry tests — throws if invoked. */
-        @Override public DeveloperTool create(gt.devtools.settings.ToolConfiguration config) {
+        @Override public DeveloperToolFx create(gt.devtools.settings.ToolConfiguration config) {
             throw new UnsupportedOperationException("not needed for registry tests");
         }
     }

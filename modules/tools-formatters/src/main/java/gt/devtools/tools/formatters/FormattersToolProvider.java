@@ -1,7 +1,7 @@
 package gt.devtools.tools.formatters;
 
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolProvider;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 
 import java.util.List;
 
@@ -12,10 +12,10 @@ public final class FormattersToolProvider implements ToolProvider {
     @Override public String getName() { return "Formatters"; }
 
     @Override
-    public List<ToolFactory<?>> getTools() {
+    public List<ToolFxFactory<?>> getTools() {
         return List.of(
-                new SqlFormatterTool.Factory(),
-                new CliCommandConverterTool.Factory()
+                new SqlFormatterToolFx.Factory(),
+                new CliCommandConverterToolFx.Factory()
         );
     }
 }

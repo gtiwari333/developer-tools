@@ -1,7 +1,7 @@
 package gt.devtools.tools.encoders;
 
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolProvider;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 
 import java.util.List;
 
@@ -15,15 +15,15 @@ public final class EncodersToolProvider implements ToolProvider {
     @Override public String getName() { return "Encoders / Decoders"; }
 
     @Override
-    public List<ToolFactory<?>> getTools() {
+    public List<ToolFxFactory<?>> getTools() {
         return List.of(
-                new Base64EncoderDecoder.Factory(),
-                new Base32EncoderDecoder.Factory(),
-                new UrlBase64EncoderDecoder.Factory(),
-                new MimeBase64EncoderDecoder.Factory(),
-                new AsciiEncoderDecoder.Factory(),
-                new UrlEncodingEncoderDecoder.Factory(),
-                new JwtEncoderDecoder.Factory()
+                new Base64EncoderDecoderFx.Factory(),
+                new Base32EncoderDecoderFx.Factory(),
+                new UrlBase64EncoderDecoderFx.Factory(),
+                new MimeBase64EncoderDecoderFx.Factory(),
+                new AsciiEncoderDecoderFx.Factory(),
+                new UrlEncodingEncoderDecoderFx.Factory(),
+                new JwtEncoderDecoderFx.Factory()
         );
     }
 }

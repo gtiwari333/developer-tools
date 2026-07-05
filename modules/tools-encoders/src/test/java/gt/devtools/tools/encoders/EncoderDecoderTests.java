@@ -24,15 +24,15 @@ class EncoderDecoderTests {
     @DisplayName("Base64: encode then decode returns original")
     void base64RoundTrip(String input) {
         byte[] data = input.getBytes(StandardCharsets.UTF_8);
-        byte[] encoded = Base64EncoderDecoder.encode(data);
-        byte[] decoded = Base64EncoderDecoder.decode(encoded);
+        byte[] encoded = Base64EncoderDecoderFx.encode(data);
+        byte[] decoded = Base64EncoderDecoderFx.decode(encoded);
         assertThat(new String(decoded, StandardCharsets.UTF_8)).isEqualTo(input);
     }
 
     @Test @DisplayName("Base64: empty input round-trip")
     void base64EmptyRoundTrip() {
-        byte[] encoded = Base64EncoderDecoder.encode(new byte[0]);
-        byte[] decoded = Base64EncoderDecoder.decode(encoded);
+        byte[] encoded = Base64EncoderDecoderFx.encode(new byte[0]);
+        byte[] decoded = Base64EncoderDecoderFx.decode(encoded);
         assertThat(decoded).isEmpty();
     }
 
@@ -47,8 +47,8 @@ class EncoderDecoderTests {
     @DisplayName("URL Base64: encode then decode returns original")
     void urlBase64RoundTrip(String input) {
         byte[] data = input.getBytes(StandardCharsets.UTF_8);
-        byte[] encoded = UrlBase64EncoderDecoder.encode(data);
-        byte[] decoded = UrlBase64EncoderDecoder.decode(encoded);
+        byte[] encoded = UrlBase64EncoderDecoderFx.encode(data);
+        byte[] decoded = UrlBase64EncoderDecoderFx.decode(encoded);
         assertThat(new String(decoded, StandardCharsets.UTF_8)).isEqualTo(input);
     }
 
@@ -60,8 +60,8 @@ class EncoderDecoderTests {
     @DisplayName("MIME Base64: encode then decode returns original")
     void mimeBase64RoundTrip(String input) {
         byte[] data = input.getBytes(StandardCharsets.UTF_8);
-        byte[] encoded = MimeBase64EncoderDecoder.encode(data);
-        byte[] decoded = MimeBase64EncoderDecoder.decode(encoded);
+        byte[] encoded = MimeBase64EncoderDecoderFx.encode(data);
+        byte[] decoded = MimeBase64EncoderDecoderFx.decode(encoded);
         assertThat(new String(decoded, StandardCharsets.UTF_8)).isEqualTo(input);
     }
 
@@ -74,20 +74,20 @@ class EncoderDecoderTests {
     @DisplayName("URL Encoding: encode then decode returns original")
     void urlEncodingRoundTrip(String input) throws Exception {
         byte[] data = input.getBytes(StandardCharsets.UTF_8);
-        byte[] encoded = UrlEncodingEncoderDecoder.encode(data);
-        byte[] decoded = UrlEncodingEncoderDecoder.decode(encoded);
+        byte[] encoded = UrlEncodingEncoderDecoderFx.encode(data);
+        byte[] decoded = UrlEncodingEncoderDecoderFx.decode(encoded);
         assertThat(new String(decoded, StandardCharsets.UTF_8)).isEqualTo(input);
     }
 
     @Test @DisplayName("Base64 known value")
     void base64KnownValue() {
-        byte[] encoded = Base64EncoderDecoder.encode("hello".getBytes(StandardCharsets.UTF_8));
+        byte[] encoded = Base64EncoderDecoderFx.encode("hello".getBytes(StandardCharsets.UTF_8));
         assertThat(new String(encoded, StandardCharsets.UTF_8)).isEqualTo("aGVsbG8=");
     }
 
     @Test @DisplayName("Base64 produces non-empty output for non-empty input")
     void base64NonEmpty() {
-        byte[] encoded = Base64EncoderDecoder.encode("hello".getBytes(StandardCharsets.UTF_8));
+        byte[] encoded = Base64EncoderDecoderFx.encode("hello".getBytes(StandardCharsets.UTF_8));
         assertThat(encoded).isNotEmpty();
         assertThat(new String(encoded, StandardCharsets.UTF_8)).isNotEqualTo("hello");
     }
@@ -96,7 +96,7 @@ class EncoderDecoderTests {
     void urlBase64NoSpecialChars() {
         byte[] data = new byte[256];
         for (int i = 0; i < 256; i++) data[i] = (byte) i;
-        String encoded = new String(UrlBase64EncoderDecoder.encode(data), StandardCharsets.UTF_8);
+        String encoded = new String(UrlBase64EncoderDecoderFx.encode(data), StandardCharsets.UTF_8);
         assertThat(encoded).doesNotContain("+", "/");
     }
 }

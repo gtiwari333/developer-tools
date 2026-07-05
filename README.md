@@ -4,13 +4,23 @@ A collection of 40+ developer utilities in a single desktop application. Built w
 
 ## Download
 
-Pre-built native binaries for Linux, macOS, and Windows are available on the [Releases page](https://github.com/gtiwari333/developer-tools-desktop/releases). No JRE required.
+Pre-built distributions are available on the [Releases page](https://github.com/gtiwari333/developer-tools-desktop/releases).
+
+### Native Images (recommended)
+Standalone binaries — no JRE required, instant startup, low memory.
 
 | Platform | Binary |
 |----------|--------|
 | Linux | `developer-tools` |
 | macOS | `developer-tools` |
 | Windows | `developer-tools.exe` |
+
+### JDK-Bundled ZIP
+A portable ZIP with an embedded minimal JRE created via **jlink**. Unzip and run — no Java installation needed. Useful for debugging with standard JDK tooling or when the native image can't run on your platform.
+
+| Platform | Archive |
+|----------|---------|
+| Linux | `developer-tools-*-linux-x64.zip` |
 
 ## Tools
 
@@ -57,6 +67,21 @@ Config Format Converter (JSON ↔ YAML ↔ XML ↔ TOML), Regex Matcher, JSON Pa
 ```bash
 ./gradlew :app:nativeCompile
 # Output: app/build/native/nativeCompile/developer-tools
+```
+
+### Build JDK-bundled ZIP
+Creates a portable distribution with an embedded minimal JRE (jlink):
+```bash
+./gradlew :app:runtimeZip
+# Output: app/build/distributions/developer-tools-<version>-linux-x64.zip
+```
+
+This runs `jlink` to produce a stripped JRE with only the modules the app needs, then bundles it with the application JARs and a launch script. The result is a self-contained ZIP — just extract and run `bin/developer-tools`.
+
+To create a native installer image instead (`.deb`/`.rpm`/`.dmg`/`.exe`), use:
+```bash
+./gradlew :app:jpackageImage
+# Output: app/build/jpackage/DeveloperTools/
 ```
 
 ### Build for all platforms (CI)

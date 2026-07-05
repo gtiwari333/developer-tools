@@ -1,7 +1,7 @@
 package gt.devtools.tools.standalone;
 
-import gt.devtools.tools.api.ToolFactory;
 import gt.devtools.tools.api.ToolProvider;
+import gt.devtools.tools.api.fx.ToolFxFactory;
 
 import java.util.List;
 
@@ -12,22 +12,22 @@ public final class StandaloneToolProvider implements ToolProvider {
     @Override public String getName() { return "Standalone Tools"; }
 
     @Override
-    public List<ToolFactory<?>> getTools() {
+    public List<ToolFxFactory<?>> getTools() {
         return List.of(
-                new ConfigFormatConverter.Factory(),
-                new RegexMatcherTool.Factory(),
-                new JsonPathTool.Factory(),
-                new DatetimeConverterTool.Factory(),
-                new CronExpressionTool.Factory(),
-                new ColorPickerTool.Factory(),
-                new QrCodeGeneratorTool.Factory(),
-                new AsciiArtTool.Factory(),
-                new UnitConverterTool.Factory(),
-                new ServerCertificatesTool.Factory(),
-                new ArchiveInspectorTool.Factory(),
-                new HttpServerTool.Factory(),
-                new NotesTool.Factory(),
-                new RubberDuckTool.Factory()
+                new ConfigFormatConverterFx.Factory(),
+                new RegexMatcherToolFx.Factory(),
+                new JsonPathToolFx.Factory(),
+                new DatetimeConverterToolFx.Factory(),
+                new CronExpressionToolFx.Factory(),
+                new ColorPickerToolFx.Factory(),
+                new QrCodeGeneratorToolFx.Factory(),
+                new AsciiArtToolFx.Factory(),
+                new UnitConverterToolFx.Factory(),
+                new ServerCertificatesToolFx.Factory(),
+                new ArchiveInspectorToolFx.Factory(),
+                new HttpServerToolFx.Factory(),
+                new NotesToolFx.Factory(),
+                new RubberDuckToolFx.Factory()
         );
     }
 }

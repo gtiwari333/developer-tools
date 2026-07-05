@@ -1,4 +1,8 @@
-plugins { java }
+plugins {
+    java
+    id("org.openjfx.javafxplugin")
+}
+javafx { version = "23.0.2"; modules = listOf("javafx.controls") }
 
 dependencies {
     implementation(project(":modules:common"))

@@ -1,0 +1,347 @@
+[
+  {
+    "name": "gt.devtools.app.DevToolsAppFx",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "gt.devtools.settings.AppSettings",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.application.Application",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.stage.Stage",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.Scene",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.TreeView",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.TabPane",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.SplitPane",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.Button",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.TextField",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.TextArea",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.ComboBox",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.CheckBox",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.Spinner",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.Label",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.MenuBar",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.ContextMenu",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.control.ScrollPane",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.layout.BorderPane",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.layout.VBox",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.layout.HBox",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.embed.swing.SwingNode",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.embed.swing.SwingFXUtils",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.shape.Rectangle",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.image.ImageView",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.paint.Color",
+    "allDeclaredMethods": true
+  },
+
+  {
+    "name": "gt.devtools.tools.encoders.EncodersToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.escape.EscapeToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.crypto.CryptoToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.text.TextToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.formatters.FormattersToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+  {
+    "name": "gt.devtools.tools.standalone.StandaloneToolProvider",
+    "allDeclaredConstructors": true,
+    "methods": [{"name": "getTools", "parameterTypes": []}]
+  },
+
+  {
+    "name": "gt.devtools.tools.encoders.Base64EncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.Base32EncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.AsciiEncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.UrlBase64EncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.MimeBase64EncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.UrlEncodingEncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.encoders.JwtEncoderDecoder$Factory",
+    "allDeclaredConstructors": true
+  },
+
+  {
+    "name": "gt.devtools.tools.escape.HtmlEntitiesEscaperUnescaper$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.escape.EscapeSequencesEscaperUnescaper$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.escape.JsonTextEscaperUnescaper$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.escape.JavaStringEscaperUnescaper$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.escape.XmlTextEscaperUnescaper$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.escape.CsvTextEscaperUnescaper$Factory",
+    "allDeclaredConstructors": true
+  },
+
+  {
+    "name": "gt.devtools.tools.crypto.UuidGeneratorTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.crypto.UlidGeneratorTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.crypto.NanoIdGeneratorTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.crypto.PasswordGeneratorTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.crypto.LoremIpsumGeneratorTool$Factory",
+    "allDeclaredConstructors": true
+  },
+
+  {
+    "name": "gt.devtools.tools.text.HashingTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.text.HmacTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.text.TextCaseTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.text.TextFilterTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.text.TextSortingTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.text.TextStatisticsTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.text.TextDiffTool$Factory",
+    "allDeclaredConstructors": true
+  },
+
+  {
+    "name": "gt.devtools.tools.formatters.SqlFormatterTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.formatters.CliCommandConverterTool$Factory",
+    "allDeclaredConstructors": true
+  },
+
+  {
+    "name": "gt.devtools.tools.standalone.ConfigFormatConverter$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.RegexMatcherTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.JsonPathTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.DatetimeConverterTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.CronExpressionTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.AsciiArtTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.ColorPickerTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.QrCodeGeneratorTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.UnitConverterTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.NotesTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.RubberDuckTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.HttpServerTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.ServerCertificatesTool$Factory",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "gt.devtools.tools.standalone.ArchiveInspectorTool$Factory",
+    "allDeclaredConstructors": true
+  },
+
+  {
+    "name": "com.formdev.flatlaf.FlatDarkLaf",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatLightLaf",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "org.fife.ui.rsyntaxtextarea.RSyntaxTextArea",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  }
+]

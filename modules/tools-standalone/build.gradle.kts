@@ -1,4 +1,9 @@
-plugins { java }
+plugins {
+    java
+    id("org.openjfx.javafxplugin")
+}
+
+javafx { version = "23.0.2"; modules = listOf("javafx.controls", "javafx.graphics") }
 
 tasks.compileJava {
     // jfiglet lacks JPMS metadata — allow reading from classpath
